@@ -9,6 +9,7 @@ def connectToDatabase():
     return cnx
 
 
+# def addMenu()
 
 def addAccount(cnx, balance):
     cursor = cnx.cursor()
@@ -36,13 +37,17 @@ def addCustomer(cnx, name, email, passWord):
     cursor = cnx.cursor()
     # first create an account
 
+    # first check if the email already exists
+
+
     # we'll need a function to ask how much money they want to put in their account, maybe implement payments -> currently giving a hardcoded value
-    account_number = addAccount(cnx, 10)
+    account_number = addAccount(cnx, 0)
 
     query_add_customer = ("INSERT INTO customer "
                          "(customerName, accountNo, email, pass) "
                          "VALUES (%s, %s, %s, %s)")
 
+    # add email validation -> https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/
     data_customer = (name, account_number, email, passWord)
     cursor.execute(query_add_customer, data_customer)
     cnx.commit()
@@ -52,5 +57,5 @@ def addCustomer(cnx, name, email, passWord):
 
 if __name__ == '__main__':
     cnx = connectToDatabase()
-    addCustomer(cnx, "Tarun", "hello@gmail.com", "hello")
+    addCustomer(cnx, "Jose", "hello1@gmail.com", "hello1")
     cnx.close()
