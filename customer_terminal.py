@@ -14,6 +14,36 @@ def registerCustomer(name, email, passWord):
     database_operations.addCustomer(connectionObj, name, email, hashedPass)
     return 1
 
+def registerOrder(orderId, itemId, restaurantId, qty):
+    connectionObj = database_operations.connectToDatabase()
+    database_operations.addOrder(connectionObj, orderId, restaurantId, itemId, qty)
+    connectionObj.close()
+
+def isRegisteredRestaurant(restId):
+    connectionObj = database_operations.connectToDatabase()
+    return_val = database_operations.isValidRestaurant(connectionObj, restId)
+    connectionObj.close()
+    return return_val
+
+def lastOrderId():
+    connectionObj = database_operations.connectToDatabase()
+    lastOrderNumber = database_operations.getLastOrderId(connectionObj)
+    return lastOrderNumber
+def isRegisteredItem(itemId, restuarantId):
+    connectionObj = database_operations.connectToDatabase()
+    return_val = database_operations.isValidItem(connectionObj, itemId, restuarantId)
+    connectionObj.close()
+    return return_val
+
+def displayRestaurants():
+    connectionObj = database_operations.connectToDatabase()
+    database_operations.showRestaurants(connectionObj)
+    connectionObj.close()
+
+def showItems(restaurantId):
+    connectionObj = database_operations.connectToDatabase()
+    database_operations.showRItems(connectionObj, restaurantId)
+    connectionObj.close()
 
 def isRegisteredCustomer(email,password):
     connectionObj = database_operations.connectToDatabase()
@@ -44,11 +74,51 @@ if __name__ == '__main__':
             if stringVal == "Registered User":
 
             # if the user is registered then sign in
-                choice = input("\n What operation would you like to perform? \n 1. Place an order \n 2. Check status of your order 3. Exit\n ")
+            # show restaurants
+                while True:
+                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order \n 4. Exit \n ")
 
-                if choice == '3':
-                    sys.exit()
+                    if choice == '1':
+                        displayRestaurants()
+                        continue
+                    elif choice == '2':
+                        restaurantId = input("Enter the restaurant id in which you would like to place the order in")
+                        # check if it is a valid restaurantId
+                        returnValRegisteredRestaurant = isRegisteredRestaurant(restaurantId)
+                        if returnValRegisteredRestaurant == -1:
+                            print("The restaurant ID is invalid, please enter a valid restaurant id")
+                            continue
+                        elif returnValRegisteredRestaurant == 1:
+                            # show the items in the restaurant
+                            showItems(restaurantId)
+                            itemsList = []
+
+                            lastOrderNumber = lastOrderId()
+                            currOrderNumber = lastOrderNumber + 1
+                            while True:
+                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, onc you're done please enter 2")
+                                if itemIdAndQty == '2':
+                                    break
+                                itemQtyArr = itemIdAndQty.split(' ')
+                                # qty should be an integer
+                                # item id should be valid
+                                itemAlreadyPresent = isRegisteredItem(itemQtyArr[0],restaurantId)
+                                if itemAlreadyPresent == -1:
+                                    print("The item ID is invalid, please enter a valid item ID")
+                                    continue
+                                elif itemAlreadyPresent == 1:
+                                    registerOrder(currOrderNumber, itemQtyArr[0], restaurantId, itemQtyArr[1])
+
+                            print("Order successfully placed, we'll shortly send you the estimated time for your order pickup")
+
+
+
+
+
+                    if choice == '4':
+                        sys.exit()
             else:
+                print(stringVal)
                 continue
         else:
             # sign up the user
