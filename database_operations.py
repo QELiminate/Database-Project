@@ -2,19 +2,97 @@ from __future__ import print_function
 import mysql.connector
 from mysql.connector import errorcode
 
+import utility_functions
+
+
 def connectToDatabase():
     cnx = mysql.connector.connect(user='root', password='zip85;ski',
                                   host='127.0.0.1', port='3306',
                                   database='app_schema')
     return cnx
 
+def isValidUser(cnx, email, passoword):
+    cursor = cnx.cursor()
 
-# def addMenu()
+    cursor.execute('SELECT * FROM customer where email ="' + email +'"')
+    customerInfo = cursor.fetchone()
+    if customerInfo is None:
+        return -1
+    else:
+        passwordInDB = customerInfo[4]
+        # compare entered password with passwordInDB
+        isPasswordCorrect = utility_functions.checkPassword(passoword, passwordInDB)
+        if not isPasswordCorrect:
+            return -2
+        else:
+            return 1
+    cursor.close()
+def showRestaurants(cnx):
+    # written by Jose
+    cursor = cnx.cursor()
+    showRestQuery = ('SELECT restaurantName FROM Restaurant')
+    cursor.execute(showRestQuery)
+    result = cursor.fetchall()
+    print ('Restaurants:\n')
+    for r in result:
+        print(r[0], '\n')
+    cursor.close()
+
+def showRItems(cnx, RSelect):
+    # written by Jose
+    cursor = cnx.cursor()
+    showRItemQuery = ('SELECT ItemName, Price FROM Menu M, Restaurant R WHERE M.RestaurantID=R.RestaurantID AND R.restaurantName="' + RSelect+'"')
+    cursor.execute(showRItemQuery)
+    result = cursor.fetchall()
+    print('Menu for ' + RSelect + '\n')
+    print('Item:           Price: \n')
+    for r in result:
+        print(str(r[0]) + '           ' + str(r[1]) + '\n')
+
+def addOrder(cnx, restaurantId, itemId, quantity):
+    # written by Tarun
+    cursor = cnx.cursor()
+    query_add_orders = ("INSERT INTO orders "
+                         "(ItemID, RestaurantID, Quantity) "
+                         "VALUES (%s, %s, %s)")
+    values = (itemId, restaurantId, quantity)
+    cursor.execute(query_add_orders, values)
+    cnx.commit()
+
+    cursor.close()
+
+    # recent order is the last row and order Id of the last row is number of rows
+    count_number_of_orders_query = "SELECT COUNT(*) FROM orders"
+    cursor.execute(count_number_of_orders_query)
+    numberofRows = cursor.fetchone()[0]
+
+    # numberofRows is equal to the account number recently created
+    recent_order_number = numberofRows
+
+    cursor.close()
+
+    return recent_order_number
+
+
+def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
+    # written by Tarun
+    cursor = cnx.cursor()
+    query_add_account = ("INSERT INTO orderinfo "
+                         "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID) "
+                         "VALUES (%s, %s, %s, %s, %s, %s, %s)")
+    # orderExpirationDateTime = readyTime + 1 hr
+    values = (orderId, False, readyTime, totalPrice, False, readyTime, restaurantId)
+    cursor.execute(query_add_account, values)
+    cnx.commit()
+
+    cursor.close()
+
 
 def addAccount(cnx, balance):
+    # written by Tarun
     cursor = cnx.cursor()
     query_add_account = ("INSERT INTO account "
-                          "(balance)"
+                          "(balance) "
                           "VALUES (%s)")
     values = (balance, )
     cursor.execute(query_add_account, values)
@@ -34,6 +112,7 @@ def addAccount(cnx, balance):
 
     return account_number
 def addCustomer(cnx, name, email, passWord):
+    # written by Tarun
     cursor = cnx.cursor()
     # first create an account
 
@@ -57,5 +136,9 @@ def addCustomer(cnx, name, email, passWord):
 
 if __name__ == '__main__':
     cnx = connectToDatabase()
-    addCustomer(cnx, "Jose", "hello1@gmail.com", "hello1")
+    # addCustomer(cnx, "Jose", "hello1@gmail.com", "hello1")
+    # showRestaurants(cnx)
+    # showRItems(cnx, "McDonalds")
+    isValidUser(cnx, "hello@gmail.com", "hello")
     cnx.close()
+
