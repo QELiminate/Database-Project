@@ -14,10 +14,38 @@ def registerCustomer(name, email, passWord):
     database_operations.addCustomer(connectionObj, name, email, hashedPass)
     return 1
 
+<<<<<<< HEAD
 def registerOrder(orderId, itemId, restaurantId, qty):
     connectionObj = database_operations.connectToDatabase()
     database_operations.addOrder(connectionObj, orderId, restaurantId, itemId, qty)
     connectionObj.close()
+=======
+def insertToMenu():
+    cursor = cnx.cursor()
+    query_add_order = ("INSERT INTO Menu "
+                         "(ItemID, RestaurantID, ItemName, Price) "
+                         "VALUES (%d, %d, %s, %d)")
+    order = (ItemID, RestaurantID, ItemName, Price)
+    cursor.execute(query_add_order, order)
+    query_add_restaurant = ("INSERT INTO Restaurant "
+                            "(RestaurantID, restaurantName) "
+                         "VALUES (%d, %s)")
+    cursor.execute(query_add_restaurant, restaurant)
+def placeOrderCustomer():
+
+    restaurant = (RestaurantID, restaurantName)
+    restaurantsID = ("SELECT RestaurantID FROM Restaurant")
+    rID = (RestaurantID)
+    
+    #cursor.execute(restaurantsID, rID)
+    itemsID = ("SELECT ItemID FROM Menu")
+    iID = (ItemID)
+    #cursor.execute(itemsID, iID)
+
+
+
+
+>>>>>>> 07bf618 (...)
 
 def isRegisteredRestaurant(restId):
     connectionObj = database_operations.connectToDatabase()

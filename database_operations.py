@@ -5,9 +5,9 @@ import utility_functions
 
 
 def connectToDatabase():
-    cnx = mysql.connector.connect(user='root', password='Abc123()?',
+    cnx = mysql.connector.connect(user='root', password='',
                                   host='127.0.0.1', port='3306',
-                                  database='app_schema')
+                                  database='app_schema'
     return cnx
 
 def getLastOrderId(cnx):
