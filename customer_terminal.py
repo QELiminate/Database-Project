@@ -15,6 +15,7 @@ def insertToMenu():
 
 
 def insertRestaurant():
+    cursor = cnx.cursor()
     restaurant = (RestaurantID, restaurantName)
     query_add_restaurant = ("INSERT INTO Restaurant "
                             "(RestaurantID, restaurantName) "
@@ -23,19 +24,22 @@ def insertRestaurant():
 
 
 def placeOrderCustomer():
+    cursor = cnx.cursor()
     restaurantsID = ("SELECT RestaurantID FROM Restaurant")
     rID = (RestaurantID)
     #cursor.execute(restaurantsID, rID)
     itemsID = ("SELECT ItemID FROM Menu")
     iID = (ItemID)
     placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID")
+    cursor.execute(placingOrder, rID)
     #cursor.execute(itemsID, iID)
 
-
-
-
-
 def checkStatusOrder():
+    cursor = cnx.cursor()
+    status = ("SELECT isOrderPickedUp FROM Orders")
+    pickedup = (isOrderPickedUp)
+    cursor.execute(status, pickedup)
+
 
 if __name__ == '__main__':
     print("\n Hello, Welcome to QElim. \n PLease Sign In/Sign Up to place an order \n")
