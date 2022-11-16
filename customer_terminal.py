@@ -35,7 +35,7 @@ def placeOrderCustomer():
     #cursor.execute(itemsID, iID)
 
 def checkStatusOrder():
-    cursor = cnx.cursor()
+    cursor = cnx.cursor()#test
     status = ("SELECT isOrderPickedUp FROM Orders")
     pickedup = (isOrderPickedUp)
     cursor.execute(status, pickedup)
