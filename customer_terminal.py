@@ -32,7 +32,7 @@ def placeOrderCustomer():
     iID = (ItemID)
     placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID")
     cursor.execute(placingOrder, rID)
-    #cursor.execute(itemsID, iID)
+    #cursor.execute(itemsID, iID)#here
 
 def checkStatusOrder():
     cursor = cnx.cursor()#test
