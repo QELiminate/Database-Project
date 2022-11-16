@@ -25,7 +25,7 @@ def insertRestaurant():
 
 def placeOrderCustomer():
     cursor = cnx.cursor()
-    restaurantsID = ("SELECT RestaurantID FROM Restaurant")
+    restaurantsID = ('SELECT RestaurantID FROM Restaurant')
     rID = (RestaurantID)
     #cursor.execute(restaurantsID, rID)
     itemsID = ("SELECT ItemID FROM Menu")
@@ -39,6 +39,10 @@ def checkStatusOrder():
     status = ("SELECT isOrderPickedUp FROM Orders")
     pickedup = (isOrderPickedUp)
     cursor.execute(status, pickedup)
+    if cursor.fetchone() is 0:
+        return -1
+    return 1
+
 
 
 if __name__ == '__main__':
