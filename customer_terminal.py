@@ -4,6 +4,7 @@ def registerCustomer(name, email, passWord):
     # hash the password and then store
     connectionObj = database_operations.connectToDatabase()
     database_operations.addCustomer(connectionObj, name, email, passWord)
+    cnx.commit();
 
 def insertToMenu():
     cursor = cnx.cursor()
@@ -12,6 +13,7 @@ def insertToMenu():
                          "VALUES (%d, %d, %s, %d)")
     order = (ItemID, RestaurantID, ItemName, Price)
     cursor.execute(query_add_order, order)
+    cnx.commit();
 
 
 def insertRestaurant():
@@ -21,6 +23,7 @@ def insertRestaurant():
                             "(RestaurantID, restaurantName) "
                          "VALUES (%d, %s)")
     cursor.execute(query_add_restaurant, restaurant)
+    cnx.commit();
 
 
 def placeOrderCustomer():
@@ -33,6 +36,7 @@ def placeOrderCustomer():
     placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID")
     cursor.execute(placingOrder, rID)
     #cursor.execute(itemsID, iID)#here
+    cnx.commit();
 
 def checkStatusOrder():
     cursor = cnx.cursor()#test
@@ -42,9 +46,14 @@ def checkStatusOrder():
     if cursor.fetchone() is 0:
         return -1
     return 1
+    cnx.commit();
 
-
-
+def payment():
+    cursor = cnx.cursor()
+    payment = ("SELECT (Account.balance-Orders.totalprice) AS balance FROM table Orders CROSS JOIN table Account WHERE Orders.totalprice = Item.cost")
+    cost = (balance)
+    cursor.execute(payment, cost);
+    cnx.commit();
 if __name__ == '__main__':
     print("\n Hello, Welcome to QElim. \n PLease Sign In/Sign Up to place an order \n")
     isUserRegisteredInput = input("\n If you're already a registered user? Y/N \n")
