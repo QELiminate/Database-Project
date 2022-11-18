@@ -1,12 +1,17 @@
 # Database-Project
+please create your own branch to work on your part
 
-Whenever making a pull request please add tarunkukreja003 as the reviewer <br>
-whenever pulling, run the following commands:<br>
+
+Always pull the code to update your branch by running the following commands in order:<br>
   git pull master <br>
   git checkout your_branch_name <br>
   git merge origin/master <br>
 
-please create your own branch to work on your part
+Whenever making a pull request please add tarunkukreja003 as the reviewer <br>
+
+After you have made your changes, write an appropriate commit message and push your code to YOUR BRANCH by running the following command:
+
+git push origin your_branch_name <br>
 
 Configuration Steps:
 
