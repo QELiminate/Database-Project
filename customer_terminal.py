@@ -33,7 +33,7 @@ def placeOrderCustomer():
     #cursor.execute(restaurantsID, rID)
     itemsID = ("SELECT ItemID FROM Menu")
     iID = (ItemID)
-    placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID")
+    placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID WHERE ItemID = itemsID")
     cursor.execute(placingOrder, rID)
     #cursor.execute(itemsID, iID)#here
     cnx.commit();
