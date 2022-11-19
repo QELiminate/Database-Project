@@ -1,7 +1,7 @@
 from __future__ import print_function
 import mysql.connector
 from mysql.connector import errorcode
-
+from datetime import datetime, timedelta
 import utility_functions
 
 
@@ -10,6 +10,19 @@ def connectToDatabase():
                                   host='127.0.0.1', port='3306',
                                   database='app_schema')
     return cnx
+
+def getItemNameFromItemId(cnx, itemID):
+    cursor = cnx.cursor()
+    cursor.execute('select * from menu where ItemID=' + str(itemID))
+    itemName = cursor.fetchone()[2]
+    return itemName
+def getLastOrderInfo(cnx):
+
+    lastOrderId = getLastOrderId(cnx)
+    cursor = cnx.cursor()
+    # select all rows with orderId = lastOrderId
+    cursor.execute('SELECT * from orders where orderID =' + str(lastOrderId))
+    return cursor.fetchall()
 
 def getLastOrderId(cnx):
     cursor = cnx.cursor()
@@ -59,10 +72,12 @@ def isValidRestaurant(cnx, restaurantId):
 def isValidItem(cnx, itemId, restaurantID):
     cursor = cnx.cursor()
     cursor.execute('SELECT * from Menu M where M.ItemID = '+ str(itemId) + ' and M.RestaurantID= ' + str(restaurantID))
-    if cursor.fetchone() is None:
-        return -1
+    fetchedItem = cursor.fetchone()
+    if fetchedItem is None:
+        return (-1, None)
     else:
-        return 1
+        # return the price of the item
+        return (1, fetchedItem[3])
 def showRItems(cnx, RSelect):
     # written by Jose
     cursor = cnx.cursor()
@@ -92,12 +107,14 @@ def addOrder(cnx, orderId, restaurantId, itemId, quantity):
 def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     # written by Tarun
     cursor = cnx.cursor()
-    query_add_account = ("INSERT INTO orderinfo "
+    print(restaurantId)
+    query_add_orderInfo = ("INSERT INTO orderinfo "
                          "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID) "
                          "VALUES (%s, %s, %s, %s, %s, %s, %s)")
     # orderExpirationDateTime = readyTime + 1 hr
-    values = (orderId, False, readyTime, totalPrice, False, readyTime, restaurantId)
-    cursor.execute(query_add_account, values)
+    # we'll not implement expirationDateTime, instead we'll have a script/cronjob that runs at 3:00 am everyday and deletes all orders
+    values = (orderId, 0, readyTime, totalPrice, 0, readyTime, restaurantId)
+    cursor.execute(query_add_orderInfo, values)
     cnx.commit()
 
     cursor.close()
@@ -155,5 +172,7 @@ if __name__ == '__main__':
     # showRestaurants(cnx)
     # showRItems(cnx, "McDonalds")
     # isValidUser(cnx, "hello@gmail.com", "hello")
+    # print(getLastOrderInfo(cnx))
+    print()
     cnx.close()
 

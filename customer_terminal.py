@@ -2,6 +2,8 @@ import sys
 
 import database_operations
 import utility_functions
+import time
+import restaurant_terminal
 
 
 def registerCustomer(name, email, passWord):
@@ -95,6 +97,7 @@ if __name__ == '__main__':
 
                             lastOrderNumber = lastOrderId()
                             currOrderNumber = lastOrderNumber + 1
+                            totalPriceOfOrder = 0
                             while True:
                                 itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, onc you're done please enter 2")
                                 if itemIdAndQty == '2':
@@ -103,15 +106,23 @@ if __name__ == '__main__':
                                 # qty should be an integer
                                 # item id should be valid
                                 itemAlreadyPresent = isRegisteredItem(itemQtyArr[0],restaurantId)
-                                if itemAlreadyPresent == -1:
+                                if itemAlreadyPresent[0] == -1:
                                     print("The item ID is invalid, please enter a valid item ID")
                                     continue
-                                elif itemAlreadyPresent == 1:
+                                elif itemAlreadyPresent[0] == 1:
                                     registerOrder(currOrderNumber, itemQtyArr[0], restaurantId, itemQtyArr[1])
+                                    totalPriceOfOrder += itemAlreadyPresent[1] * int(itemQtyArr[1])
 
+                            tax = 0.1 * totalPriceOfOrder
+                            print("The total amount is ", totalPriceOfOrder + tax)
+                            print("Please choose a method of payment")
+                            # implement payment methods
                             print("Order successfully placed, we'll shortly send you the estimated time for your order pickup")
 
+                            input("Please wait while the restaurant sends you the order pickup time")
 
+                            # after every 5 sec check if order id is there in ordersInfo, if it is then get the ready time
+                            # if the ready time is returned exit the terminal
 
 
 
@@ -145,12 +156,6 @@ if __name__ == '__main__':
 
 
 
-
-        # Jose
-        # once signed up/ signed in -> will show all the restaurants name
-        # customer should select a restaurant
-        # once the restaurant is selected show all the item names for the restaurant
-        # customer will select a set of items and their quantity
 
 
 
