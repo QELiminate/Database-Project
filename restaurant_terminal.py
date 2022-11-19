@@ -7,5 +7,7 @@ if __name__ == '__main__':
 	   printf("Your order has been placed!")
     # restaurant will see the order ->
     orderid = ("SELECT OrderID FROM Order WHERE ItemID = item")
+    order = OrderID
+    execute(orderid, order)
     # restaurant will enter the preparation time for the order - for now
 
