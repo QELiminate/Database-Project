@@ -1,5 +1,6 @@
 import bcrypt
 import re
+from datetime import datetime, timedelta
 
 def hashPassword(password):
     password = bytes(password, 'utf-8')
@@ -26,6 +27,11 @@ def isValidEmail(email):
     else:
         return False
 
+
+def parseStrToDateTimeObj(dateTimeStr):
+    format = "%Y-%m-%d %H:%M:%S"
+    dateTimeObj = datetime.strptime(dateTimeStr, format)
+    return dateTimeObj
 # if __name__ == '__main__':
 #     hashVal = hashPassword("hello")
 #     print("type -> ", type(hashVal))
