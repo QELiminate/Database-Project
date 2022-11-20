@@ -1,7 +1,7 @@
 from __future__ import print_function
 import mysql.connector
 from mysql.connector import errorcode
-from datetime import datetime, timedelta
+
 import utility_functions
 
 
@@ -39,15 +39,15 @@ def isValidUser(cnx, email, passoword):
     cursor.execute('SELECT * FROM customer where email ="' + email +'"')
     customerInfo = cursor.fetchone()
     if customerInfo is None:
-        return -1
+        return (-1, None, None)
     else:
         passwordInDB = customerInfo[4]
         # compare entered password with passwordInDB
         isPasswordCorrect = utility_functions.checkPassword(passoword, passwordInDB)
         if not isPasswordCorrect:
-            return -2
+            return (-2, None, None)
         else:
-            return 1
+            return (1, customerInfo[0], customerInfo[1])
     cursor.close()
 def showRestaurants(cnx):
     # written by Jose
@@ -85,29 +85,33 @@ def showRItems(cnx, RSelect):
     cursor.execute(showRItemQuery)
     result = cursor.fetchall()
     print('Menu for ' + RSelect + '\n')
-    print('Item ID:           Price: \n')
+    print('Item ID:          Item Name:             Price: \n')
     for r in result:
-        print(str(r[0]) + '           ' + str(r[1]) + '\n')
+        print(str(r[0]) + '           ' + str(r[1]) + '           ' + str(r[2]) + '\n')
     cursor.close()
 
-def addOrder(cnx, orderId, restaurantId, itemId, quantity):
+def addOrder(cnx, orderId, restaurantId, itemId, quantity, custId):
     # written by Tarun
     cursor = cnx.cursor()
     query_add_orders = ("INSERT INTO orders "
-                         "(orderID, ItemID, RestaurantID, Quantity) "
-                         "VALUES (%s, %s, %s, %s)")
-    values = (orderId, itemId, restaurantId, quantity)
+                         "(orderID, ItemID, RestaurantID, customerID, Quantity) "
+                         "VALUES (%s, %s, %s, %s, %s)")
+    values = (orderId, itemId, restaurantId, custId, quantity)
     cursor.execute(query_add_orders, values)
     cnx.commit()
 
     cursor.close()
 
 
-
+def getLastNRowsFromOrdersTable(cnx, numRows):
+    cursor = cnx.cursor()
+    query = "SELECT * FROM orders ORDER BY orderID DESC LIMIT " + str(numRows)
+    cursor.execute(query)
+    cursor.close()
+    return cursor.fetchall()
 def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     # written by Tarun
     cursor = cnx.cursor()
-    print(restaurantId)
     query_add_orderInfo = ("INSERT INTO orderinfo "
                          "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID) "
                          "VALUES (%s, %s, %s, %s, %s, %s, %s)")
