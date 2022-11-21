@@ -169,6 +169,13 @@ def addCustomer(cnx, name, email, passWord):
 
     cursor.close()
 
+def cancelOrder(orderID):
+    #cancel order (delete order and notify about cancellation) - written by Jose
+    cursor = cnx.cursor()
+    deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=', orderID)
+    cursor.execute(deleteOrderQuery)
+    print ('Order ', orderID,' has been canceled.\n')
+    
 
 if __name__ == '__main__':
     cnx = connectToDatabase()
