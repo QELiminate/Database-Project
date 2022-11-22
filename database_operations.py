@@ -33,6 +33,13 @@ def getLastOrderId(cnx):
     else:
         return lastOrderInfo[0]
 
+
+def getCustomerNameFromID(cnx, customerId):
+    cursor = cnx.cursor()
+    query = 'SELECT customerName FROM customer where customerID = ' + str(customerId)
+    cursor.execute(query)
+    customerName = cursor.fetchone()
+    return customerName
 def isValidUser(cnx, email, passoword):
     cursor = cnx.cursor()
 
@@ -78,6 +85,14 @@ def isValidItem(cnx, itemId, restaurantID):
     else:
         # return the price of the item
         return (1, fetchedItem[3])
+
+def getItemNameFromItemID(cnx, itemId, restaurantId):
+    cursor = cnx.cursor()
+    query = ('SELECT ItemName FROM Menu M, Restaurant R WHERE M.RestaurantID=R.RestaurantID AND R.RestaurantID=' + str(restaurantId) + ' AND M.ItemID=' + str(itemId))
+    cursor.execute(query)
+    resultItemName = cursor.fetchone()
+    cursor.close()
+    return resultItemName
 def showRItems(cnx, RSelect):
     # written by Jose
     cursor = cnx.cursor()
@@ -103,21 +118,31 @@ def addOrder(cnx, orderId, restaurantId, itemId, quantity, custId):
     cursor.close()
 
 
+def getOrdersForRestaurant(cnx, restuarntId):
+    cursor = cnx.cursor()
+    query = ("SELECT * FROM orders where RestaurantID = " + restuarntId)
+    cursor.execute(query)
+    allResultsList = cursor.fetchall()
+    cursor.close()
+    return allResultsList
+
+
 def getLastNRowsFromOrdersTable(cnx, numRows):
     cursor = cnx.cursor()
     query = "SELECT * FROM orders ORDER BY orderID DESC LIMIT " + str(numRows)
     cursor.execute(query)
+    allResultsList = cursor.fetchall()
     cursor.close()
-    return cursor.fetchall()
+    return allResultsList
 def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     # written by Tarun
     cursor = cnx.cursor()
     query_add_orderInfo = ("INSERT INTO orderinfo "
-                         "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID) "
-                         "VALUES (%s, %s, %s, %s, %s, %s, %s)")
+                         "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, RestaurantID) "
+                         "VALUES (%s, %s, %s, %s, %s, %s)")
     # orderExpirationDateTime = readyTime + 1 hr
     # we'll not implement expirationDateTime, instead we'll have a script/cronjob that runs at 3:00 am everyday and deletes all orders
-    values = (orderId, 0, readyTime, totalPrice, 0, readyTime, restaurantId)
+    values = (orderId, 0, readyTime, totalPrice, 0, restaurantId)
     cursor.execute(query_add_orderInfo, values)
     cnx.commit()
 

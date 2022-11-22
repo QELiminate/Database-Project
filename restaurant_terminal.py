@@ -13,6 +13,9 @@ The following function gets the datetime from the restaurant and sends it to the
 #     example.has_been_called = True
 #     pass
 
+class Store:
+    def __init__(self):
+        self.itemIDRestaurantIdToItemNameHashTable = {}
 
 
 def registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime):
@@ -38,7 +41,52 @@ def lastOrderInfo():
     return (orderInfoList[0][0], orderInfoList[0][2], totalPayment)
 
 
-# if __name__ == "__main__" :
+def getAllOrdersForRestaurant(restaurantId):
+    storeObj = Store()
+    connObj = database_operations.connectToDatabase()
+    allOrders = database_operations.getOrdersForRestaurant(connObj, restaurantId)
+
+
+    # get the customer name and item names to display in the order
+
+    customerId = 0
+    i = 0
+
+    while i < len(allOrders):
+
+
+        customerId = allOrders[i][3]
+
+        customerNameTuple = database_operations.getCustomerNameFromID(connObj, customerId)
+        print("Order for " + customerNameTuple[0] + "\n")
+        # get the order(s) for the customer
+        print("OrderID          Item             Quantity    \n")
+        while i < len(allOrders) and allOrders[i][3] == customerId:
+            orderId = allOrders[i][0]
+            itemId = allOrders[i][1]
+            restaurantID = allOrders[i][2]
+            qty = allOrders[i][4]
+            itemName = ''
+
+            # if (itemId, restaurantID) is already in the hashtable then get its name else make a query to fetch it from database and store it in hashtable
+            if (itemId, restaurantID) not in storeObj.itemIDRestaurantIdToItemNameHashTable:
+                itemNameTuple = database_operations.getItemNameFromItemID(connObj, itemId, restaurantID)
+                storeObj.itemIDRestaurantIdToItemNameHashTable[(itemId, restaurantID)] = itemNameTuple[0]
+                itemName = itemNameTuple[0]
+            else:
+                itemName = storeObj.itemIDRestaurantIdToItemNameHashTable[(itemId, restaurantID)]
+
+            print(str(orderId) + "           " + itemName + "            " + str(qty))
+            i += 1
+
+
+if __name__ == "__main__" :
+    restaurantId = input("Enter your restaurant ID")
+
+    # get all the orders for the restaurant
+    getAllOrdersForRestaurant(restaurantId)
+
+
 #
 #     lastOrderInfo()
     # print("New Order\n")
