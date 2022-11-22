@@ -119,8 +119,16 @@ if __name__ == '__main__':
 
                             tax = 0.1 * totalPriceOfOrder
                             print("The total amount is ", totalPriceOfOrder + tax)
-                            print("Please choose a method of payment")
-                            # implement payment methods
+                            payment = input("type pay to process payment or cancel to cancel order: ")
+                            if payment = 'pay':
+                                # implement payment methods
+                                total = totalPriceOrder+tax
+                                paid = payOrder(total,customerId)
+                                if paid==False:
+                                    return
+                            elif payment = 'cancel':
+                                cancelOrder(currOrderNumber)
+                                return
 
                             print("\n Order successfully placed, we'll shortly send you the estimated time for your order pickup \n")
 
@@ -131,6 +139,12 @@ if __name__ == '__main__':
                             orderId, restaurantId, totalPayment = restaurant_terminal.lastOrderInfo()
                             readyDateTime = input("\nPlease enter the ready date(YYYY-MM-DD) and time(hh:mm:ss) for the order separated by space\n")
                             restaurant_terminal.registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
+                            restcommand = input("Type cancel to cancel an order or type proceed to continue: \n")
+                            if restcommand='cancel':
+                                ordertocancel = input("Type order ID of order to be cancelled: \n")
+                                cancelOrder(ordertocancel)
+                            elif restcommand='proceed':
+                                print("Proceeding...\n")
                             print("\n Customer View\n ")
                             print("Your order's estimated time for pickup is: \n")
                             dateTimeObj = utility_functions.parseStrToDateTimeObj(readyDateTime)
