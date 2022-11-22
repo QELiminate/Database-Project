@@ -149,6 +149,13 @@ def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     cursor.close()
 
 
+def getReadyTimeForOrder(cnx, orderId):
+    cursor = cnx.cursor()
+    query = 'SELECT readyTime from orderinfo where orderID=' + str(orderId)
+    cursor.execute(query)
+    readyTimeTuple = cursor.fetchone()
+    cursor.close()
+    return readyTimeTuple
 def addAccount(cnx, balance):
     # written by Tarun
     cursor = cnx.cursor()

@@ -58,11 +58,25 @@ def getAllOrdersForRestaurant(restaurantId):
         customerId = allOrders[i][3]
 
         customerNameTuple = database_operations.getCustomerNameFromID(connObj, customerId)
-        print("Order for " + customerNameTuple[0] + "\n")
+        print("\n \n Order for " + customerNameTuple[0] + "\n")
         # get the order(s) for the customer
-        print("OrderID          Item             Quantity    \n")
+
         while i < len(allOrders) and allOrders[i][3] == customerId:
-            orderId = allOrders[i][0]
+            # if the orderid change/first row then only get the ready time for that order
+
+            if i == 0:
+                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, allOrders[i][0])
+                print("\n\nOrder ID: ", allOrders[i][0])
+
+                print("\nReady Date and Time: ", readyDateTimeTuple[0])
+            elif i-1 >= 0 and allOrders[i-1][0] != allOrders[i][0]:
+                # get the ready time
+                orderId = allOrders[i][0]
+                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, orderId)
+                print("Order ID: ", orderId)
+                print("Ready Date and Time: ", readyDateTimeTuple[0])
+
+
             itemId = allOrders[i][1]
             restaurantID = allOrders[i][2]
             qty = allOrders[i][4]
@@ -76,15 +90,23 @@ def getAllOrdersForRestaurant(restaurantId):
             else:
                 itemName = storeObj.itemIDRestaurantIdToItemNameHashTable[(itemId, restaurantID)]
 
-            print(str(orderId) + "           " + itemName + "            " + str(qty))
+            print(itemName + "            " + str(qty))
             i += 1
 
 
 if __name__ == "__main__" :
-    restaurantId = input("Enter your restaurant ID")
 
-    # get all the orders for the restaurant
-    getAllOrdersForRestaurant(restaurantId)
+
+    while True:
+        print("\nRestaurant View\n")
+        restaurantId = input("\nEnter your restaurant ID\n")
+        choice = input("What operation would you like to perform: \n 1. View all orders  \n2. Update the ready time for an order \n3. Cancel an order \n4. Update the order pickup status \n5. Exit")
+
+        if choice == '1':
+            # get all the orders for the restaurant
+            getAllOrdersForRestaurant(restaurantId)
+        elif choice == '5':
+            sys.exit()
 
 
 #
