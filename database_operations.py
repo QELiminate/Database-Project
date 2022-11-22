@@ -176,6 +176,29 @@ def cancelOrder(orderID):
     cursor.execute(deleteOrderQuery)
     print ('Order ', orderID,' has been canceled.\n')
     
+#pay for order
+def payOrder(total, customerID):
+    cursor = cnx.cursor()
+    #access account balance
+    getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=', customerID)
+    cursor.execute(getAccountNoQuery)
+    AccountNo = cursor.fetchone()
+    getBalanceQuery = ('SELECT balance FROM Account A WHERE A.AccountNo=', AccountNo)
+    cursor.execute(getBalanceQuery)
+    balance = cursor.fetchone()
+    #if, order total is greater than account balance, then decline order
+    if total>balance:
+        print('Insufficient funds in account, order cancelled.\n')
+        return False
+    #else, decrease balance by order total
+    else:
+        balance-=total
+        updateBalanceQuery = ('UPDATE Account SET balance=',balance,' WHERE AccountNo=', AccountNo)
+        cursor.execute(updateBalanceQuery)
+        #notify that payment went through
+        print('Payment processed.')
+        return True
+    
 
 if __name__ == '__main__':
     cnx = connectToDatabase()
