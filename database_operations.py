@@ -11,18 +11,21 @@ def connectToDatabase():
                                   database='app_schema')
     return cnx
 
-def getItemNameFromItemId(cnx, itemID):
+def getRestaurantNameFromID(cnx, restaurantID):
     cursor = cnx.cursor()
-    cursor.execute('select * from menu where ItemID=' + str(itemID))
-    itemName = cursor.fetchone()[2]
-    return itemName
+    cursor.execute("SELECT restaurantName from restaurant where RestaurantID=" + str(restaurantID))
+    restaurantNameTuple = cursor.fetchone()
+    cursor.close()
+    return restaurantNameTuple
 def getLastOrderInfo(cnx):
 
     lastOrderId = getLastOrderId(cnx)
     cursor = cnx.cursor()
     # select all rows with orderId = lastOrderId
     cursor.execute('SELECT * from orders where orderID =' + str(lastOrderId))
-    return cursor.fetchall()
+    fetcAll = cursor.fetchall()
+    cursor.close()
+    return fetcAll
 
 def getLastOrderId(cnx):
     cursor = cnx.cursor()
@@ -75,6 +78,24 @@ def isValidRestaurant(cnx, restaurantId):
         return -1
     else:
         return 1
+
+
+def getCustomerIDForOrder(cnx, orderID, restaurantId):
+    cursor = cnx.cursor(buffered=True)
+    print(orderID, restaurantId)
+    query = "SELECT customerID from orders where orderID=" + str(orderID) + " and restaurantId=" + str(restaurantId)
+    cursor.execute(query)
+    customerIDTuple = cursor.fetchone()
+    cursor.close()
+    return customerIDTuple
+
+def orderReady(cnx, orderId, restaurantId):
+    cursor = cnx.cursor()
+    updateisReady = "UPDATE orderinfo SET isReady = 1 WHERE orderID=%s AND RestaurantID=%s"
+    values = (orderId, restaurantId)
+    cursor.execute(updateisReady, values)
+    cnx.commit()
+    cursor.close()
 
 def isValidItem(cnx, itemId, restaurantID):
     cursor = cnx.cursor()

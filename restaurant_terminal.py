@@ -2,6 +2,7 @@ import sys
 
 import database_operations
 from datetime import datetime, timedelta
+from classes import Store
 
 '''
 The following function gets the datetime from the restaurant and sends it to the customer
@@ -13,9 +14,7 @@ The following function gets the datetime from the restaurant and sends it to the
 #     example.has_been_called = True
 #     pass
 
-class Store:
-    def __init__(self):
-        self.itemIDRestaurantIdToItemNameHashTable = {}
+
 
 
 def registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime):
@@ -92,21 +91,58 @@ def getAllOrdersForRestaurant(restaurantId):
 
             print(itemName + "            " + str(qty))
             i += 1
+    del storeObj
+def checkForValidRestaurantID(restaurantId):
+    storeObj = Store()
 
+    if restaurantId in storeObj.restaurantIDSet:
+        return 1
 
+    connObj = database_operations.connectToDatabase()
+
+    return_value = database_operations.isValidRestaurant(connObj, restaurantId)
+
+    if return_value == 1 and restaurantId not in storeObj.restaurantIDSet:
+            storeObj.restaurantIDSet.add(restaurantId)
+
+    return return_value
+
+def notifyCustomerOrderReady(orderId, restaurantId):
+
+    # set isReady to 1 in orderinfo table
+    conObj = database_operations.connectToDatabase()
+    database_operations.orderReady(conObj, orderId, restaurantId)
+    cusotmerIDTuple = database_operations.getCustomerIDForOrder(conObj, orderId, restaurantId)
+    print("cusotmerIDTuple: ", cusotmerIDTuple)
+
+    # get the name of the customer
+    customerNameTuple = database_operations.getCustomerNameFromID(conObj, customerId=cusotmerIDTuple[0])
+    restaurantNameTuple = database_operations.getRestaurantNameFromID(conObj, restaurantId)
+    # notify the customer
+    print("\nCustomer View\n")
+    print("\n Hello " + customerNameTuple[0] + " your order number " + str(orderId) + " with the restaurant " + restaurantNameTuple[0] + " is ready \n")
 if __name__ == "__main__" :
 
 
     while True:
         print("\nRestaurant View\n")
         restaurantId = input("\nEnter your restaurant ID\n")
-        choice = input("What operation would you like to perform: \n 1. View all orders  \n2. Update the ready time for an order \n3. Cancel an order \n4. Update the order pickup status \n5. Exit")
+        returnValue = checkForValidRestaurantID(restaurantId)
+        if returnValue == 1:
+            choice = input("What operation would you like to perform: \n 1. View all orders  \n2. Notify the customer that order is ready \n 3. Update the ready time for an order \n4. Cancel an order \n5. Update the order pickup status \n6. Exit")
 
-        if choice == '1':
-            # get all the orders for the restaurant
-            getAllOrdersForRestaurant(restaurantId)
-        elif choice == '5':
-            sys.exit()
+            if choice == '1':
+                # get all the orders for the restaurant
+                getAllOrdersForRestaurant(restaurantId)
+            elif choice == '2':
+                orderID = input("\n Enter the order ID for the order which is ready \n")
+                notifyCustomerOrderReady(orderID, restaurantId)
+
+            elif choice == '5':
+                sys.exit()
+        else:
+            print("Invalid Restaurant ID")
+
 
 
 #
