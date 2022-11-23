@@ -125,6 +125,7 @@ if __name__ == '__main__':
                                 total = totalPriceOrder+tax
                                 paid = payOrder(total,customerId)
                                 if paid==False:
+                                    cancelOrder(currOrderNumber)
                                     return
                             elif payment = 'cancel':
                                 cancelOrder(currOrderNumber)
