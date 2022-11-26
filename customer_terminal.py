@@ -124,12 +124,12 @@ if __name__ == '__main__':
                             if payment = 'pay':
                                 # implement payment methods
                                 total = totalPriceOrder+tax
-                                paid = payOrder(total,customerId)
+                                paid = database_operations.payOrder(total,customerId)
                                 if paid==False:
-                                    cancelOrder(currOrderNumber)
+                                    database_operations.cancelOrder(currOrderNumber)
                                     return
                             elif payment = 'cancel':
-                                cancelOrder(currOrderNumber)
+                                database_operations.cancelOrder(currOrderNumber)
                                 return
                             #Jose code end
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
                             restcommand = input("Type cancel to cancel an order or type proceed to continue: \n")
                             if restcommand='cancel':
                                 ordertocancel = input("Type order ID of order to be cancelled: \n")
-                                cancelOrder(ordertocancel)
+                                database_operations.cancelOrder(ordertocancel)
                             elif restcommand='proceed':
                                 print("Proceeding...\n")
                             #Jose code end
@@ -156,6 +156,14 @@ if __name__ == '__main__':
                             print("\n Date: " + str(dateTimeObj.month) + "-" + str(dateTimeObj.day) + "-" + str(dateTimeObj.year))
                             print("\n Time in 24 hour format: \n")
                             print(str(dateTimeObj.hour) + ":" + str(dateTimeObj.minute))
+                            
+                            #Jose code start
+                            #Let restaurant change bool pickedup to 1 (true) Check if picked up is true, if so then delete order from order info and orders tables
+                            comm = input("To mark an order as picked up, type pickup\n")
+                            if comm == 'pickup':
+                                ord = input("Enter the order number to mark as picked up: \n")
+                                database_operations.setOrderPickedup(ord)
+                            #Jose code end
 
 
                             # input("Please wait while the restaurant sends you the order pickup time")
