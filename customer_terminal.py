@@ -119,6 +119,7 @@ if __name__ == '__main__':
 
                             tax = 0.1 * totalPriceOfOrder
                             print("The total amount is ", totalPriceOfOrder + tax)
+                            #Jose code start
                             payment = input("\n type pay to process payment or cancel to cancel order: \n")
                             if payment = 'pay':
                                 # implement payment methods
@@ -130,6 +131,7 @@ if __name__ == '__main__':
                             elif payment = 'cancel':
                                 cancelOrder(currOrderNumber)
                                 return
+                            #Jose code end
 
                             print("\n Order successfully placed, we'll shortly send you the estimated time for your order pickup \n")
 
@@ -140,12 +142,14 @@ if __name__ == '__main__':
                             orderId, restaurantId, totalPayment = restaurant_terminal.lastOrderInfo()
                             readyDateTime = input("\nPlease enter the ready date(YYYY-MM-DD) and time(hh:mm:ss) for the order separated by space\n")
                             restaurant_terminal.registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
+                            #Jose code start
                             restcommand = input("Type cancel to cancel an order or type proceed to continue: \n")
                             if restcommand='cancel':
                                 ordertocancel = input("Type order ID of order to be cancelled: \n")
                                 cancelOrder(ordertocancel)
                             elif restcommand='proceed':
                                 print("Proceeding...\n")
+                            #Jose code end
                             print("\n Customer View\n ")
                             print("Your order's estimated time for pickup is: \n")
                             dateTimeObj = utility_functions.parseStrToDateTimeObj(readyDateTime)
