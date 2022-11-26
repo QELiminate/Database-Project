@@ -174,7 +174,24 @@ def cancelOrder(orderID):
     cursor = cnx.cursor()
     deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=' + str(orderID))
     cursor.execute(deleteOrderQuery)
-    print ('Order ', orderID,' has been canceled.\n')
+    cursor.close()
+    print ('Order '+ str(orderID) +' has been canceled.\n')
+    
+#written by Jose
+def setOrderPickedup(ord):
+    #Let restaurant change bool pickedup to 1 (true) Check if picked up is true, if so then delete order from order info and orders tables
+    cursor = cnx.cursor()
+    setPickedUpQuery = ('UPDATE orderinfo SET isOrderPickedUp=1 WHERE orderID=' + str(ord))
+    cursor.execute(setPickedUpQuery)
+    cursor.close()
+    print ('Order '+ str(ord) +' has been picked up.\n')
+    
+#written by Jose
+def clearPickedOrders():
+    cursor = cnx.cursor()
+    clearPickedQuery = ('DELETE FROM orderinfo WHERE isOrderPickedUp=1')
+    cursor.execute(clearPickedQuery)
+    cursor.close()
     
 #pay for order - written by Jose
 def payOrder(total, customerID):
@@ -191,6 +208,7 @@ def payOrder(total, customerID):
     #if, order total is greater than account balance, then decline order
     if total>balance:
         print('Insufficient funds in account, order cancelled.\n')
+        cursor.close()
         return False
     #else, decrease balance by order total
     else:
@@ -199,6 +217,7 @@ def payOrder(total, customerID):
         cursor.execute(updateBalanceQuery)
         #notify that payment went through
         print('Payment processed.')
+        cursor.close()
         return True
     
 
