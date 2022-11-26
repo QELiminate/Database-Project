@@ -163,6 +163,9 @@ if __name__ == '__main__':
                             if comm == 'pickup':
                                 ord = input("Enter the order number to mark as picked up: \n")
                                 database_operations.setOrderPickedup(ord)
+                            comm2 = input("Clear picked up orders? y/n : \n")
+                            if comm2 == 'y':
+                                database_operations.clearPickedOrders()
                             #Jose code end
 
 
