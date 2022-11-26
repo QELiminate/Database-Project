@@ -172,20 +172,22 @@ def addCustomer(cnx, name, email, passWord):
 def cancelOrder(orderID):
     #cancel order (delete order and notify about cancellation) - written by Jose
     cursor = cnx.cursor()
-    deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=', orderID)
+    deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=' + str(orderID))
     cursor.execute(deleteOrderQuery)
     print ('Order ', orderID,' has been canceled.\n')
     
-#pay for order
+#pay for order - written by Jose
 def payOrder(total, customerID):
     cursor = cnx.cursor()
     #access account balance
-    getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=', customerID)
+    getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=' + str(customerID))
     cursor.execute(getAccountNoQuery)
     AccountNo = cursor.fetchone()
-    getBalanceQuery = ('SELECT balance FROM Account A WHERE A.AccountNo=', AccountNo)
+    getBalanceQuery = ('SELECT balance FROM Account A WHERE A.AccountNo=' + str(AccountNo))
     cursor.execute(getBalanceQuery)
     balance = cursor.fetchone()
+    balance = float(balance)
+    total = float(total)
     #if, order total is greater than account balance, then decline order
     if total>balance:
         print('Insufficient funds in account, order cancelled.\n')
@@ -193,7 +195,7 @@ def payOrder(total, customerID):
     #else, decrease balance by order total
     else:
         balance-=total
-        updateBalanceQuery = ('UPDATE Account SET balance=',balance,' WHERE AccountNo=', AccountNo)
+        updateBalanceQuery = ('UPDATE Account SET balance=' + str(balance) + ' WHERE AccountNo=' + str(AccountNo))
         cursor.execute(updateBalanceQuery)
         #notify that payment went through
         print('Payment processed.')
