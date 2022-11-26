@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
                             tax = 0.1 * totalPriceOfOrder
                             print("The total amount is ", totalPriceOfOrder + tax)
-                            payment = input("type pay to process payment or cancel to cancel order: ")
+                            payment = input("\n type pay to process payment or cancel to cancel order: \n")
                             if payment = 'pay':
                                 # implement payment methods
                                 total = totalPriceOrder+tax
