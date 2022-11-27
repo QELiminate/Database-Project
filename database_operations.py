@@ -174,6 +174,7 @@ def cancelOrder(orderID):
     cursor = cnx.cursor()
     deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=' + str(orderID))
     cursor.execute(deleteOrderQuery)
+    orderDeleteParityCheck()
     cursor.close()
     print ('Order '+ str(orderID) +' has been canceled.\n')
     
@@ -191,6 +192,36 @@ def clearPickedOrders():
     cursor = cnx.cursor()
     clearPickedQuery = ('DELETE FROM orderinfo WHERE isOrderPickedUp=1')
     cursor.execute(clearPickedQuery)
+    orderDeleteParityCheck()
+    cursor.close()
+    
+#written by Jose, ensures that there are no orphaned Order or orderinfo tables when a row in either is deleted.
+def orderDeleteParityCheck():
+    cursor = cnx.cursor()
+    selectOrdersQuery = ('SELECT orderID FROM orders')
+    cursor.execute(selectOrdersQuery)
+    ord1 = cursor.fetchall()
+    selectOrderInfosQuery = ('SELECT orderID FROM orderinfo')
+    cursor.execute(selectOrderInfosQuery)
+    ord2 = cursor.fetchall()
+    
+    match = 0
+    for x in ord1:
+        for y in ord2:
+            if x[0] == y[0]:
+                match = 1
+        if match == 0:
+            deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(x[0]))
+            cursor.execute(deleteOrderQuery)
+    
+    match = 0
+    for x in ord2:
+        for y in ord1:
+            if x[0] == y[0]:
+                match = 1
+        if match == 0:
+            deleteOrderInfoQuery = ('DELETE FROM orderinfo WHERE orderID=' + str(x[0]))
+            cursor.execute(deleteOrderInfoQuery)
     cursor.close()
     
 #pay for order - written by Jose
