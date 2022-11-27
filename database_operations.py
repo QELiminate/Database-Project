@@ -172,11 +172,30 @@ def addCustomer(cnx, name, email, passWord):
 def cancelOrder(orderID):
     #cancel order (delete order and notify about cancellation) - written by Jose
     cursor = cnx.cursor()
-    deleteOrderQuery = ('DELETE FROM Orders WHERE orderID=' + str(orderID))
+    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
     cursor.execute(deleteOrderQuery)
     orderDeleteParityCheck()
+    #refund order
+    getTotalPriceQuery = ('SELECT totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID))
+    cursor.execute(getTotalPriceQuery)
+    totalp = cursor.fetchone()[0]
+    
+    getBalanceQuery = ('SELECT A.balance FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo')
+    cursor.execute(getBalanceQuery)
+    balan = cursor.fetchone()[0]
+    
+    getAccountQuery = ('SELECT A.accountNo FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo')
+    cursor.execute(getAccountQuery)
+    AccountNo = cursor.fetchone()[0]
+    
+    totalp = float(totalp)
+    balan = float(balan)
+    balan = balan + totalp
+    updateBalanceQuery = ('UPDATE Account SET balance=' + str(balance) + ' WHERE AccountNo=' + str(AccountNo))
+    cursor.execute(updateBalanceQuery)
+    
     cursor.close()
-    print ('Order '+ str(orderID) +' has been canceled.\n')
+    print ('Order '+ str(orderID) +' has been canceled and refunded.\n')
     
 #written by Jose
 def setOrderPickedup(ord):
