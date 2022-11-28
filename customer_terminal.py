@@ -80,8 +80,8 @@ if __name__ == '__main__':
             # if the user is registered then sign in
             # show restaurants
                 while True:
-                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order 
-                                   \n 4. Cancel an Order \n 5. Exit \n ")
+                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order"+ 
+                                   "\n 4. Cancel an Order \n 5. Exit \n ")
 
                     if choice == '1':
                         displayRestaurants()
