@@ -126,7 +126,8 @@ if __name__ == "__main__" :
             continue
         returnValue = checkForValidRestaurantID(restaurantId)
         if returnValue == 1:
-            choice = input("What operation would you like to perform: \n 1. View all orders  \n 2. Notify the customer that order is ready \n 3. Update the ready time for an order \n 4. Cancel an order \n 5. Update the order pickup status \n 6. Exit \n")
+            choice = input("What operation would you like to perform: \n 1. View all orders  \n 2. Notify the customer that order is ready"+ 
+                           "\n 3. Cancel an order \n 4. Update the order pickup status \n 5. Clear picked up orders \n 6. Exit \n")
 
             if choice == '1':
                 # get all the orders for the restaurant
@@ -137,7 +138,23 @@ if __name__ == "__main__" :
                 if returnValue is None:
                     print("Order ID doesn't exist")
                     continue
-            elif choice == '5':
+                    
+                    
+            elif choice == '3':
+                #cancel order - written by Jose
+                ordertocancel = input("Type order ID of order to be cancelled: \n")
+                database_operations.cancelOrder(ordertocancel)
+                continue    
+            elif choice == '4':
+                #mark order as picked up - written by Jose
+                ord = input("Enter the order number to mark as picked up: \n")
+                database_operations.setOrderPickedup(ord)
+                continue
+             if choice == '5':
+                #clear all orders marked as picked up - written by Jose
+                database_operations.clearPickedOrders()
+                continue
+            elif choice == '6':
                 sys.exit()
         else:
             print("Invalid Restaurant ID")
