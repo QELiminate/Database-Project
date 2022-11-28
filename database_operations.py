@@ -169,7 +169,7 @@ def addCustomer(cnx, name, email, passWord):
 
     cursor.close()
 
-def cancelOrder(orderID):
+def cancelOrder(cnx, orderID):
     #cancel order (delete order and notify about cancellation) - written by Jose
     cursor = cnx.cursor()
     deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
@@ -198,7 +198,7 @@ def cancelOrder(orderID):
     print ('Order '+ str(orderID) +' has been canceled and refunded.\n')
     
 #written by Jose
-def setOrderPickedup(ord):
+def setOrderPickedup(cnx, ord):
     #Let restaurant change bool pickedup to 1 (true) Check if picked up is true, if so then delete order from order info and orders tables
     cursor = cnx.cursor()
     setPickedUpQuery = ('UPDATE orderinfo SET isOrderPickedUp=1 WHERE orderID=' + str(ord))
@@ -207,7 +207,7 @@ def setOrderPickedup(ord):
     print ('Order '+ str(ord) +' has been picked up.\n')
     
 #written by Jose
-def clearPickedOrders():
+def clearPickedOrders(cnx):
     cursor = cnx.cursor()
     clearPickedQuery = ('DELETE FROM orderinfo WHERE isOrderPickedUp=1')
     cursor.execute(clearPickedQuery)
@@ -215,7 +215,7 @@ def clearPickedOrders():
     cursor.close()
     
 #written by Jose, ensures that there are no orphaned Order or orderinfo tables when a row in either is deleted.
-def orderDeleteParityCheck():
+def orderDeleteParityCheck(cnx):
     cursor = cnx.cursor()
     selectOrdersQuery = ('SELECT orderID FROM orders')
     cursor.execute(selectOrdersQuery)
@@ -244,7 +244,7 @@ def orderDeleteParityCheck():
     cursor.close()
     
 #pay for order - written by Jose
-def payOrder(total, customerID):
+def payOrder(cnx, total, customerID):
     cursor = cnx.cursor()
     #access account balance
     getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=' + str(customerID))
