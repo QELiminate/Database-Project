@@ -62,6 +62,7 @@ def isRegisteredCustomer(email,password):
 # def checkStatusOrder():
 
 if __name__ == '__main__':
+    cnx = database_operations.connectToDatabase()
     while True:
         print("Customer View")
         print("\n Hello, Welcome to QElim. \n PLease Sign In/Sign Up to place an order \n")
@@ -125,12 +126,12 @@ if __name__ == '__main__':
                             if payment == 'pay':
                                 # implement payment methods
                                 total = totalPriceOrder+tax
-                                paid = database_operations.payOrder(total,customerId)
+                                paid = database_operations.payOrder(cnx, total,customerId)
                                 if paid==False:
-                                    database_operations.cancelOrder(currOrderNumber)
+                                    database_operations.cancelOrder(cnx, currOrderNumber)
                                     continue
                             elif payment == 'cancel':
-                                database_operations.cancelOrder(currOrderNumber)
+                                database_operations.cancelOrder(cnx, currOrderNumber)
                                 continue
                             #Jose code end
 
@@ -159,7 +160,7 @@ if __name__ == '__main__':
                     elif choice == '4':
                                    #cancel order - written by Jose
                                    ordertocancel = input("Type order ID of order to be cancelled: \n")
-                                   database_operations.cancelOrder(ordertocancel)
+                                   database_operations.cancelOrder(cnx, ordertocancel)
                                    continue
                                    
                     elif choice == '5':
