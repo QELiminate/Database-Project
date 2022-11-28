@@ -6,7 +6,7 @@ import utility_functions
 
 
 def connectToDatabase():
-    cnx = mysql.connector.connect(user='root', password='zip85;ski',
+    cnx = mysql.connector.connect(user='root', password='JCM05djp3eb4d',
                                   host='127.0.0.1', port='3306',
                                   database='app_schema')
     return cnx
@@ -70,7 +70,7 @@ def isValidRestaurant(cnx, restaurantId):
         return 1
 
 def isValidItem(cnx, itemId, restaurantID):
-    cursor = cnx.cursor()
+    cursor = cnx.cursor(buffered=True)
     cursor.execute('SELECT * from Menu M where M.ItemID = '+ str(itemId) + ' and M.RestaurantID= ' + str(restaurantID))
     fetchedItem = cursor.fetchone()
     if fetchedItem is None:
@@ -169,14 +169,11 @@ def addCustomer(cnx, name, email, passWord):
 
     cursor.close()
 
-def cancelOrder(cnx, orderID):
-    #cancel order (delete order and notify about cancellation) - written by Jose
-    cursor = cnx.cursor()
-    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
-    cursor.execute(deleteOrderQuery)
-    orderDeleteParityCheck(cnx)
+def cancelOrder(cnx, orderID):#cancel order (delete order and notify about cancellation) - written by Jose
     #refund order
-    getTotalPriceQuery = ('SELECT totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID))
+    cursor = cnx.cursor(buffered=True)
+
+    getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID))
     cursor.execute(getTotalPriceQuery)
     totalp = cursor.fetchone()[0]
     
@@ -191,8 +188,13 @@ def cancelOrder(cnx, orderID):
     totalp = float(totalp)
     balan = float(balan)
     balan = balan + totalp
-    updateBalanceQuery = ('UPDATE Account SET balance=' + str(balance) + ' WHERE AccountNo=' + str(AccountNo))
+    updateBalanceQuery = ('UPDATE Account SET balance=' + str(balan) + ' WHERE AccountNo=' + str(AccountNo))
     cursor.execute(updateBalanceQuery)
+
+    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
+    cursor.execute(deleteOrderQuery)
+    cnx.commit()
+    orderDeleteParityCheck(cnx)
     
     cursor.close()
     print ('Order '+ str(orderID) +' has been canceled and refunded.\n')
@@ -203,6 +205,7 @@ def setOrderPickedup(cnx, ord):
     cursor = cnx.cursor()
     setPickedUpQuery = ('UPDATE orderinfo SET isOrderPickedUp=1 WHERE orderID=' + str(ord))
     cursor.execute(setPickedUpQuery)
+    cnx.commit()
     cursor.close()
     print ('Order '+ str(ord) +' has been picked up.\n')
     
@@ -211,8 +214,10 @@ def clearPickedOrders(cnx):
     cursor = cnx.cursor()
     clearPickedQuery = ('DELETE FROM orderinfo WHERE isOrderPickedUp=1')
     cursor.execute(clearPickedQuery)
+    cnx.commit()
     orderDeleteParityCheck(cnx)
     cursor.close()
+    print('Cleared\n')
     
 #written by Jose, ensures that there are no orphaned Order or orderinfo tables when a row in either is deleted.
 def orderDeleteParityCheck(cnx):
@@ -232,6 +237,7 @@ def orderDeleteParityCheck(cnx):
         if match == 0:
             deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(x[0]))
             cursor.execute(deleteOrderQuery)
+            cnx.commit()
     
     match = 0
     for x in ord2:
@@ -241,6 +247,7 @@ def orderDeleteParityCheck(cnx):
         if match == 0:
             deleteOrderInfoQuery = ('DELETE FROM orderinfo WHERE orderID=' + str(x[0]))
             cursor.execute(deleteOrderInfoQuery)
+            cnx.commit()
     cursor.close()
     
 #pay for order - written by Jose
@@ -265,6 +272,7 @@ def payOrder(cnx, total, customerID):
         balance-=total
         updateBalanceQuery = ('UPDATE Account SET balance=' + str(balance) + ' WHERE AccountNo=' + str(AccountNo))
         cursor.execute(updateBalanceQuery)
+        cnx.commit()
         #notify that payment went through
         print('Payment processed.')
         cursor.close()
@@ -280,4 +288,3 @@ if __name__ == '__main__':
     # print(getLastOrderInfo(cnx))
     print()
     cnx.close()
-
