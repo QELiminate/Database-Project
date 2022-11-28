@@ -156,13 +156,13 @@ if __name__ == '__main__':
                             # after every 5 sec check if order id is there in ordersInfo, if it is then get the ready time
                             # if the ready time is returned exit the terminal
 
-                    if choice == '4':
+                    elif choice == '4':
                                    #cancel order - written by Jose
                                    ordertocancel = input("Type order ID of order to be cancelled: \n")
                                    database_operations.cancelOrder(ordertocancel)
                                    continue
                                    
-                    if choice == '5':
+                    elif choice == '5':
                         sys.exit()
             else:
                 print(stringValAndCustId[0])
