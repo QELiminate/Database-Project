@@ -80,7 +80,8 @@ if __name__ == '__main__':
             # if the user is registered then sign in
             # show restaurants
                 while True:
-                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order \n 4. Exit \n ")
+                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order 
+                                   \n 4. Cancel an Order \n 5. Exit \n ")
 
                     if choice == '1':
                         displayRestaurants()
@@ -127,8 +128,10 @@ if __name__ == '__main__':
                                 paid = database_operations.payOrder(total,customerId)
                                 if paid==False:
                                     database_operations.cancelOrder(currOrderNumber)
+                                    continue
                             elif payment == 'cancel':
                                 database_operations.cancelOrder(currOrderNumber)
+                                continue
                             #Jose code end
 
                             print("\n Order successfully placed, we'll shortly send you the estimated time for your order pickup \n")
@@ -140,41 +143,26 @@ if __name__ == '__main__':
                             orderId, restaurantId, totalPayment = restaurant_terminal.lastOrderInfo()
                             readyDateTime = input("\nPlease enter the ready date(YYYY-MM-DD) and time(hh:mm:ss) for the order separated by space\n")
                             restaurant_terminal.registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
-                            #Jose code start
-                            restcommand = input("Type cancel to cancel an order or type proceed to continue: \n")
-                            if restcommand=='cancel':
-                                ordertocancel = input("Type order ID of order to be cancelled: \n")
-                                database_operations.cancelOrder(ordertocancel)
-                            elif restcommand=='proceed':
-                                print("Proceeding...\n")
-                            #Jose code end
+                           
                             print("\n Customer View\n ")
                             print("Your order's estimated time for pickup is: \n")
                             dateTimeObj = utility_functions.parseStrToDateTimeObj(readyDateTime)
                             print("\n Date: " + str(dateTimeObj.month) + "-" + str(dateTimeObj.day) + "-" + str(dateTimeObj.year))
                             print("\n Time in 24 hour format: \n")
                             print(str(dateTimeObj.hour) + ":" + str(dateTimeObj.minute))
-                            
-                            #Jose code start
-                            #Let restaurant change bool pickedup to 1 (true) Check if picked up is true, if so then delete order from order info and orders tables
-                            comm = input("To mark an order as picked up, type pickup\n")
-                            if comm == 'pickup':
-                                ord = input("Enter the order number to mark as picked up: \n")
-                                database_operations.setOrderPickedup(ord)
-                            comm2 = input("Clear picked up orders? y/n : \n")
-                            if comm2 == 'y':
-                                database_operations.clearPickedOrders()
-                            #Jose code end
-
 
                             # input("Please wait while the restaurant sends you the order pickup time")
 
                             # after every 5 sec check if order id is there in ordersInfo, if it is then get the ready time
                             # if the ready time is returned exit the terminal
 
-
-
                     if choice == '4':
+                                   #cancel order - written by Jose
+                                   ordertocancel = input("Type order ID of order to be cancelled: \n")
+                                   database_operations.cancelOrder(ordertocancel)
+                                   continue
+                                   
+                    if choice == '5':
                         sys.exit()
             else:
                 print(stringValAndCustId[0])
