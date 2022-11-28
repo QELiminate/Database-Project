@@ -174,7 +174,7 @@ def cancelOrder(cnx, orderID):
     cursor = cnx.cursor()
     deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
     cursor.execute(deleteOrderQuery)
-    orderDeleteParityCheck()
+    orderDeleteParityCheck(cnx)
     #refund order
     getTotalPriceQuery = ('SELECT totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID))
     cursor.execute(getTotalPriceQuery)
@@ -211,7 +211,7 @@ def clearPickedOrders(cnx):
     cursor = cnx.cursor()
     clearPickedQuery = ('DELETE FROM orderinfo WHERE isOrderPickedUp=1')
     cursor.execute(clearPickedQuery)
-    orderDeleteParityCheck()
+    orderDeleteParityCheck(cnx)
     cursor.close()
     
 #written by Jose, ensures that there are no orphaned Order or orderinfo tables when a row in either is deleted.
