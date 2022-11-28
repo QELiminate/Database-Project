@@ -129,9 +129,19 @@ def addCustomer(cnx, name, email, passWord):
     # written by Tarun
     cursor = cnx.cursor()
     # first create an account
+    n = input(" \n Please enter your Name: \n ")
+    e = input(" \n Please enter the email: \n ")
+    p = input("\n Please enter the password: \n ")
 
     # first check if the email already exists
-
+    emailexists = ("SELECT count(*) FROM customer WHERE email = e")
+    execute(emailexists)
+    if (emailexists == 1) {
+        print("Your email already has an account.")
+        n = input(" \n Please enter your Name: \n ")
+        e = input(" \n Please enter the email: \n ")
+        p = input("\n Please enter the password: \n ")
+    }
 
     # we'll need a function to ask how much money they want to put in their account, maybe implement payments -> currently giving a hardcoded value
     account_number = addAccount(cnx, 0)
@@ -141,7 +151,7 @@ def addCustomer(cnx, name, email, passWord):
                          "VALUES (%s, %s, %s, %s)")
 
     # add email validation -> https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/
-    data_customer = (name, account_number, email, passWord)
+    data_customer = (n, account_number, e, p)
     cursor.execute(query_add_customer, data_customer)
     cnx.commit()
 

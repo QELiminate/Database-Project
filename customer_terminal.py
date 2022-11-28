@@ -60,19 +60,34 @@ if __name__ == '__main__':
 
     if isUserRegisteredInput == "Y":
         # ask user to enter username /password
-
+        username = input(" \n Please enter your username: \n ")
+        passWord = input("\n Please enter your password: \n")
         # check if the user is registered
-
-        # if the user is registered then sign in
-        input("\n What operation would you like to perform? \n 1. Place an order \n 2. Check status of your order \n ")
+        if username == ("SELECT (customer.email) FROM Account") && password == ("SELECT (customer.pass) FROM Account"):
+            choice = input("\n What operation would you like to perform? \n 1. Place an order \n 2. Check status of your order \n ")
+            if choice == 1:
+                order = input("\n Enter your order: \n")
+                placeOrderCustomer()
+            if choice == 2:
+                checkStatusOrder()
     else:
         # sign up the user
         name = input(" \n Please enter your Name: \n ")
         email = input(" \n Please enter the email: \n ")
         passWord = input("\n Please enter the password: \n ")
 
-        # we'll have to see how to create functions for payments
+        emailexists = ("SELECT count(*) FROM customer WHERE email = e")
+        execute(emailexists)
+        if (emailexists == 1) {
+            print("Your email already has an account.")
+            n = input(" \n Please enter your Name: \n ")
+            e = input(" \n Please enter the email: \n ")
+            p = input("\n Please enter the password: \n ")
+        }
 
+        execute("INSERT INTO customer (customerName, email, pass)")
+
+        # we'll have to see how to create functions for payments
 
         registerCustomer(name, email, passWord)
 
