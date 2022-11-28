@@ -88,11 +88,11 @@ if __name__ == '__main__':
                         displayRestaurants()
                         continue
                     elif choice == '2':
-                        restaurantId = input("Enter the restaurant id in which you would like to place the order in")
+                        restaurantId = input("Enter the restaurant id in which you would like to place the order in\n")
                         # check if it is a valid restaurantId
                         returnValRegisteredRestaurant = isRegisteredRestaurant(restaurantId)
                         if returnValRegisteredRestaurant == -1:
-                            print("The restaurant ID is invalid, please enter a valid restaurant id")
+                            print("The restaurant ID is invalid, please enter a valid restaurant id\n")
                             continue
                         elif returnValRegisteredRestaurant == 1:
                             # show the items in the restaurant
@@ -104,7 +104,7 @@ if __name__ == '__main__':
                             totalPriceOfOrder = 0
                             numberOfRowsInsertedInOrdersTable = 0
                             while True:
-                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, onc you're done please enter 2")
+                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, onc you're done please enter 2\n")
                                 if itemIdAndQty == '2':
                                     break
                                 itemQtyArr = itemIdAndQty.split(' ')
@@ -112,7 +112,7 @@ if __name__ == '__main__':
                                 # item id should be valid
                                 itemAlreadyPresent = isRegisteredItem(itemQtyArr[0],restaurantId)
                                 if itemAlreadyPresent[0] == -1:
-                                    print("The item ID is invalid, please enter a valid item ID")
+                                    print("The item ID is invalid, please enter a valid item ID\n")
                                     continue
                                 elif itemAlreadyPresent[0] == 1:
                                     registerOrder(currOrderNumber, itemQtyArr[0], restaurantId, itemQtyArr[1], customerId)
