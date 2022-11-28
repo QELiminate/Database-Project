@@ -2,7 +2,6 @@ import sys
 
 import database_operations
 from datetime import datetime, timedelta
-from classes import Store
 
 '''
 The following function gets the datetime from the restaurant and sends it to the customer
@@ -26,14 +25,18 @@ def lastOrderInfo():
     connObj = database_operations.connectToDatabase()
     orderInfoList = database_operations.getLastOrderInfo(connObj)
 
+    if len(orderInfoList) == 0:
+        print("No orders")
+        sys.exit()
+
     totalPrice = 0
     # [(3, 1, 1000, 102, 5), (3, 2, 1000, 102, 4)]
     print("Order ID       ItemName          Quantity")
     for itemTuple in orderInfoList:
-        itemName = database_operations.getItemNameFromItemId(connObj, itemTuple[1])
+        itemName = database_operations.getItemNameFromItemID(connObj, itemTuple[1], itemTuple[2])
         validAndItemPrice = database_operations.isValidItem(connObj, itemTuple[1], itemTuple[2])
         totalPrice += validAndItemPrice[1] * itemTuple[4]
-        print(str(itemTuple[0])+'            '+str(itemName) + '          '+str(itemTuple[4]))
+        print(str(itemTuple[0])+'            '+str(itemName[0]) + '          '+str(itemTuple[4]))
     totalPayment = 0.1 * totalPrice + totalPrice
     print("Total payment: ", totalPayment)
     connObj.close()
@@ -41,7 +44,6 @@ def lastOrderInfo():
 
 
 def getAllOrdersForRestaurant(restaurantId):
-    storeObj = Store()
     connObj = database_operations.connectToDatabase()
     allOrders = database_operations.getOrdersForRestaurant(connObj, restaurantId)
 
@@ -64,47 +66,37 @@ def getAllOrdersForRestaurant(restaurantId):
             # if the orderid change/first row then only get the ready time for that order
 
             if i == 0:
-                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, allOrders[i][0])
-                print("\n\nOrder ID: ", allOrders[i][0])
+                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, allOrders[i][0], restaurantId)
+                if readyDateTimeTuple is None:
+                    readyDateTimeTuple = ('Not yet added by the restaurant')
+                print("\nOrder ID: ", allOrders[i][0])
 
                 print("\nReady Date and Time: ", readyDateTimeTuple[0])
             elif i-1 >= 0 and allOrders[i-1][0] != allOrders[i][0]:
                 # get the ready time
                 orderId = allOrders[i][0]
-                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, orderId)
-                print("Order ID: ", orderId)
-                print("Ready Date and Time: ", readyDateTimeTuple[0])
+                readyDateTimeTuple = database_operations.getReadyTimeForOrder(connObj, orderId, restaurantId)
+                if readyDateTimeTuple is None:
+                    readyDateTimeTuple = ('Not yet added by the restaurant')
+                print("\n Order ID: ", orderId)
+                print(" \n Ready Date and Time: ", readyDateTimeTuple[0])
 
 
             itemId = allOrders[i][1]
             restaurantID = allOrders[i][2]
             qty = allOrders[i][4]
-            itemName = ''
 
             # if (itemId, restaurantID) is already in the hashtable then get its name else make a query to fetch it from database and store it in hashtable
-            if (itemId, restaurantID) not in storeObj.itemIDRestaurantIdToItemNameHashTable:
-                itemNameTuple = database_operations.getItemNameFromItemID(connObj, itemId, restaurantID)
-                storeObj.itemIDRestaurantIdToItemNameHashTable[(itemId, restaurantID)] = itemNameTuple[0]
-                itemName = itemNameTuple[0]
-            else:
-                itemName = storeObj.itemIDRestaurantIdToItemNameHashTable[(itemId, restaurantID)]
+            itemNameTuple = database_operations.getItemNameFromItemID(connObj, itemId, restaurantID)
+            itemName = itemNameTuple[0]
 
             print(itemName + "            " + str(qty))
             i += 1
-    del storeObj
-def checkForValidRestaurantID(restaurantId):
-    storeObj = Store()
 
-    if restaurantId in storeObj.restaurantIDSet:
-        return 1
+def checkForValidRestaurantID(restaurantId):
 
     connObj = database_operations.connectToDatabase()
-
     return_value = database_operations.isValidRestaurant(connObj, restaurantId)
-
-    if return_value == 1 and restaurantId not in storeObj.restaurantIDSet:
-            storeObj.restaurantIDSet.add(restaurantId)
-
     return return_value
 
 def notifyCustomerOrderReady(orderId, restaurantId):
@@ -113,31 +105,38 @@ def notifyCustomerOrderReady(orderId, restaurantId):
     conObj = database_operations.connectToDatabase()
     database_operations.orderReady(conObj, orderId, restaurantId)
     cusotmerIDTuple = database_operations.getCustomerIDForOrder(conObj, orderId, restaurantId)
-    print("cusotmerIDTuple: ", cusotmerIDTuple)
-
+    if cusotmerIDTuple is None:
+        # there is no order for the customer
+        return None
     # get the name of the customer
     customerNameTuple = database_operations.getCustomerNameFromID(conObj, customerId=cusotmerIDTuple[0])
     restaurantNameTuple = database_operations.getRestaurantNameFromID(conObj, restaurantId)
     # notify the customer
     print("\nCustomer View\n")
     print("\n Hello " + customerNameTuple[0] + " your order number " + str(orderId) + " with the restaurant " + restaurantNameTuple[0] + " is ready \n")
+    return 1
 if __name__ == "__main__" :
 
 
     while True:
         print("\nRestaurant View\n")
         restaurantId = input("\nEnter your restaurant ID\n")
+        if restaurantId == "":
+            print("Invalid Restaurant ID")
+            continue
         returnValue = checkForValidRestaurantID(restaurantId)
         if returnValue == 1:
-            choice = input("What operation would you like to perform: \n 1. View all orders  \n2. Notify the customer that order is ready \n 3. Update the ready time for an order \n4. Cancel an order \n5. Update the order pickup status \n6. Exit")
+            choice = input("What operation would you like to perform: \n 1. View all orders  \n 2. Notify the customer that order is ready \n 3. Update the ready time for an order \n 4. Cancel an order \n 5. Update the order pickup status \n 6. Exit \n")
 
             if choice == '1':
                 # get all the orders for the restaurant
                 getAllOrdersForRestaurant(restaurantId)
             elif choice == '2':
                 orderID = input("\n Enter the order ID for the order which is ready \n")
-                notifyCustomerOrderReady(orderID, restaurantId)
-
+                returnValue = notifyCustomerOrderReady(orderID, restaurantId)
+                if returnValue is None:
+                    print("Order ID doesn't exist")
+                    continue
             elif choice == '5':
                 sys.exit()
         else:

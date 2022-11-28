@@ -27,6 +27,32 @@ def isRegisteredRestaurant(restId):
     return_val = database_operations.isValidRestaurant(connectionObj, restId)
     connectionObj.close()
     return return_val
+def fetchOrdersForCustomer(customerId):
+    connObj = database_operations.connectToDatabase()
+    allOrdersList = database_operations.getOrdersForCustomer(connObj, customerId)
+
+    print("\n Order ID          Restaurant Name         Item Name           Quantity            Ready Time \n")
+    prevRestaurantId = 0
+    prevOrderId = 0
+    readyTimeTuple = None
+    restaurantNameTuple = None
+    for orderTuple in allOrdersList:
+        # if order id or restaurantID change then only get the readyTime
+        if prevOrderId != orderTuple[0] or prevRestaurantId != orderTuple[2]:
+            readyTimeTuple = database_operations.getReadyTimeForOrder(connObj, orderTuple[0], orderTuple[2])
+            if prevOrderId != orderTuple[0]:
+                prevOrderId = orderTuple[0]
+            if prevRestaurantId != orderTuple[2]:
+                prevRestaurantId = orderTuple[2]
+                # if the restaurant has changed then only get the restaurantName
+                restaurantNameTuple = database_operations.getRestaurantNameFromID(connObj, orderTuple[2])
+        itemNameTuple = database_operations.getItemNameFromItemID(connObj, orderTuple[1], orderTuple[2])
+
+        if readyTimeTuple[0] is None:
+            readyTimeTuple = ('Not yet added by restaurant')
+
+        print("\n " + str(orderTuple[0]) + "        " + str(restaurantNameTuple[0]) + "         " + str(itemNameTuple[0]) + "           " + str(orderTuple[3]) + "          " + str(readyTimeTuple[0]) + "\n")
+
 
 def lastOrderId():
     connectionObj = database_operations.connectToDatabase()
@@ -80,13 +106,13 @@ if __name__ == '__main__':
             # if the user is registered then sign in
             # show restaurants
                 while True:
-                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order \n 4. Exit \n ")
+                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3. View your orders \n 4. Exit \n ")
 
                     if choice == '1':
                         displayRestaurants()
                         continue
                     elif choice == '2':
-                        restaurantId = input("Enter the restaurant id in which you would like to place the order in")
+                        restaurantId = input("Enter the restaurant id in which you would like to place the order in\n")
                         # check if it is a valid restaurantId
                         returnValRegisteredRestaurant = isRegisteredRestaurant(restaurantId)
                         if returnValRegisteredRestaurant == -1:
@@ -102,7 +128,10 @@ if __name__ == '__main__':
                             totalPriceOfOrder = 0
                             numberOfRowsInsertedInOrdersTable = 0
                             while True:
-                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, onc you're done please enter 2")
+                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, once you're done please enter 2\n")
+                                if itemIdAndQty == '':
+                                    print("Please enter a valid value")
+                                    continue
                                 if itemIdAndQty == '2':
                                     break
                                 itemQtyArr = itemIdAndQty.split(' ')
@@ -139,14 +168,14 @@ if __name__ == '__main__':
                             print(str(dateTimeObj.hour) + ":" + str(dateTimeObj.minute))
 
 
-                            # input("Please wait while the restaurant sends you the order pickup time")
-
                             # after every 5 sec check if order id is there in ordersInfo, if it is then get the ready time
                             # if the ready time is returned exit the terminal
 
 
+                    elif choice == '3':
+                        fetchOrdersForCustomer(customerId)
 
-                    if choice == '4':
+                    elif choice == '4':
                         sys.exit()
             else:
                 print(stringValAndCustId[0])

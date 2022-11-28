@@ -67,7 +67,7 @@ def showRestaurants(cnx):
     result = cursor.fetchall()
     print ('Restaurant ID       Restaurants:\n')
     for r in result:
-        print(str(r[0]) +'      '+ r[1] +'\n')
+        print(str(r[0]) +'              '+ r[1] +'\n')
     cursor.close()
 
 def isValidRestaurant(cnx, restaurantId):
@@ -82,7 +82,6 @@ def isValidRestaurant(cnx, restaurantId):
 
 def getCustomerIDForOrder(cnx, orderID, restaurantId):
     cursor = cnx.cursor(buffered=True)
-    print(orderID, restaurantId)
     query = "SELECT customerID from orders where orderID=" + str(orderID) + " and restaurantId=" + str(restaurantId)
     cursor.execute(query)
     customerIDTuple = cursor.fetchone()
@@ -138,7 +137,13 @@ def addOrder(cnx, orderId, restaurantId, itemId, quantity, custId):
 
     cursor.close()
 
-
+def getOrdersForCustomer(cnx, customerID):
+    cursor = cnx.cursor()
+    query = 'SELECT orderID, ItemID, RestaurantID, Quantity FROM orders WHERE customerID=' + str(customerID)
+    cursor.execute(query)
+    allResultsList = cursor.fetchall()
+    cursor.close()
+    return allResultsList
 def getOrdersForRestaurant(cnx, restuarntId):
     cursor = cnx.cursor()
     query = ("SELECT * FROM orders where RestaurantID = " + restuarntId)
@@ -170,9 +175,9 @@ def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     cursor.close()
 
 
-def getReadyTimeForOrder(cnx, orderId):
-    cursor = cnx.cursor()
-    query = 'SELECT readyTime from orderinfo where orderID=' + str(orderId)
+def getReadyTimeForOrder(cnx, orderId, RestaurantID):
+    cursor = cnx.cursor(buffered=True)
+    query = 'SELECT readyTime from orderinfo where orderID=' + str(orderId) + ' AND RestaurantID=' + str(RestaurantID)
     cursor.execute(query)
     readyTimeTuple = cursor.fetchone()
     cursor.close()
