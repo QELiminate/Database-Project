@@ -121,16 +121,14 @@ if __name__ == '__main__':
                             print("The total amount is ", totalPriceOfOrder + tax)
                             #Jose code start
                             payment = input("\n type pay to process payment or cancel to cancel order: \n")
-                            if payment = 'pay':
+                            if payment == 'pay':
                                 # implement payment methods
                                 total = totalPriceOrder+tax
                                 paid = database_operations.payOrder(total,customerId)
                                 if paid==False:
                                     database_operations.cancelOrder(currOrderNumber)
-                                    return
-                            elif payment = 'cancel':
+                            elif payment == 'cancel':
                                 database_operations.cancelOrder(currOrderNumber)
-                                return
                             #Jose code end
 
                             print("\n Order successfully placed, we'll shortly send you the estimated time for your order pickup \n")
@@ -144,10 +142,10 @@ if __name__ == '__main__':
                             restaurant_terminal.registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
                             #Jose code start
                             restcommand = input("Type cancel to cancel an order or type proceed to continue: \n")
-                            if restcommand='cancel':
+                            if restcommand=='cancel':
                                 ordertocancel = input("Type order ID of order to be cancelled: \n")
                                 database_operations.cancelOrder(ordertocancel)
-                            elif restcommand='proceed':
+                            elif restcommand=='proceed':
                                 print("Proceeding...\n")
                             #Jose code end
                             print("\n Customer View\n ")
@@ -203,10 +201,3 @@ if __name__ == '__main__':
                     continue
                 else:
                     print("Registration successful, please Sign In to continue")
-
-
-
-
-
-
-
