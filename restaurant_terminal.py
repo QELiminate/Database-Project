@@ -150,7 +150,7 @@ if __name__ == "__main__" :
                 ord = input("Enter the order number to mark as picked up: \n")
                 database_operations.setOrderPickedup(ord)
                 continue
-             if choice == '5':
+            elif choice == '5':
                 #clear all orders marked as picked up - written by Jose
                 database_operations.clearPickedOrders()
                 continue
