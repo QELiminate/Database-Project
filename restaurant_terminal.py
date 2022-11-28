@@ -117,7 +117,7 @@ def notifyCustomerOrderReady(orderId, restaurantId):
     return 1
 if __name__ == "__main__" :
 
-
+    connObj = database_operations.connectToDatabase()
     while True:
         print("\nRestaurant View\n")
         restaurantId = input("\nEnter your restaurant ID\n")
@@ -143,16 +143,16 @@ if __name__ == "__main__" :
             elif choice == '3':
                 #cancel order - written by Jose
                 ordertocancel = input("Type order ID of order to be cancelled: \n")
-                database_operations.cancelOrder(ordertocancel)
+                database_operations.cancelOrder(connObj, ordertocancel)
                 continue    
             elif choice == '4':
                 #mark order as picked up - written by Jose
                 ord = input("Enter the order number to mark as picked up: \n")
-                database_operations.setOrderPickedup(ord)
+                database_operations.setOrderPickedup(connObj, ord)
                 continue
             elif choice == '5':
                 #clear all orders marked as picked up - written by Jose
-                database_operations.clearPickedOrders()
+                database_operations.clearPickedOrders(connObj)
                 continue
             elif choice == '6':
                 sys.exit()
