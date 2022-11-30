@@ -175,9 +175,9 @@ def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and noti
 
     getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID)+' AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getTotalPriceQuery)
-    totalp = cursor.fetchone()[0]
-    
-    if totalp==None:
+    try:
+        totalp = cursor.fetchone()[0]
+    except:
         print("Order Not Found. Please ensure Restaurant and Order IDs are both valid.")
         return 0
     
@@ -195,7 +195,7 @@ def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and noti
     updateBalanceQuery = ('UPDATE Account SET balance=' + str(balan) + ' WHERE AccountNo=' + str(AccountNo))
     cursor.execute(updateBalanceQuery)
 
-    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID)+' AND O.RestaurantID='+str(restaurantID))
+    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID)+' AND RestaurantID='+str(restaurantID))
     cursor.execute(deleteOrderQuery)
     cnx.commit()
     orderDeleteParityCheck(cnx)
