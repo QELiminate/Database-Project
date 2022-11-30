@@ -70,11 +70,11 @@ def payment():
 
 if __name__ == '__main__':
     
-    cursorMain=cnx.cursor()
+    cursorMain=cnx.cursor(buffered=True)
     print("\n Hello, Welcome to QElim. \n PLease Sign In/Sign Up to place an order \n")
     isUserRegisteredInput = input("\n If you're already a registered user? Y/N \n")
 
-    if isUserRegisteredInput == "Y":
+    if isUserRegisteredInput == "Y" or isUserRegisteredInput == "y":
         # ask user to enter username /password
         username = input(" \n Please enter your username (email address): \n ")
         passWord = input("\n Please enter your password: \n")
@@ -101,13 +101,14 @@ if __name__ == '__main__':
                 checkStatusOrder()
     else:
         # sign up the user
-        name = input(" \n Please enter your Name: \n ")
-        email = input(" \n Please enter the email: \n ")
-        passWord = input("\n Please enter the password: \n ")
-
-        emailexists = ("SELECT count(*) FROM customer WHERE email = e")
-        cursor.execute(emailexists)
-        print(emailexists)
+        n = input(" \n Please enter your Name: \n ")
+        e = input(" \n Please enter the email: \n ")
+        p = input("\n Please enter the password: \n ")
+        print("test")
+        emailexists = ("SELECT count(*) FROM customer WHERE email = %s")
+        executeemail = (e)
+        cursorMain.execute(emailexists, (executeemail,))
+        #print(emailexists)
  #       quit()
         if emailexists == 1:
             print("Your email already has an account.")
@@ -115,12 +116,15 @@ if __name__ == '__main__':
             e = input(" \n Please enter the email: \n ")
             p = input("\n Please enter the password: \n ")
         
-
-        execute("INSERT INTO customer (customerName, email, pass)")
-
+        print(n)
+        print(e)
+        print(p)
+        signedup = ("INSERT INTO customer (customerName, email, pass) VALUES (%s, %s, %s)")
+        signupinfo = (n, e, p)
+        cursorMain.execute(signedup, (signupinfo))
         # we'll have to see how to create functions for payments
 
-        registerCustomer(name, email, passWord)
+        registerCustomer(n, e, p)
 
 
         # Jose
