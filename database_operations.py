@@ -11,18 +11,21 @@ def connectToDatabase():
                                   database='app_schema')
     return cnx
 
-def getItemNameFromItemId(cnx, itemID):
+def getRestaurantNameFromID(cnx, restaurantID):
     cursor = cnx.cursor()
-    cursor.execute('select * from menu where ItemID=' + str(itemID))
-    itemName = cursor.fetchone()[2]
-    return itemName
+    cursor.execute("SELECT restaurantName from restaurant where RestaurantID=" + str(restaurantID))
+    restaurantNameTuple = cursor.fetchone()
+    cursor.close()
+    return restaurantNameTuple
 def getLastOrderInfo(cnx):
 
     lastOrderId = getLastOrderId(cnx)
     cursor = cnx.cursor()
     # select all rows with orderId = lastOrderId
     cursor.execute('SELECT * from orders where orderID =' + str(lastOrderId))
-    return cursor.fetchall()
+    fetcAll = cursor.fetchall()
+    cursor.close()
+    return fetcAll
 
 def getLastOrderId(cnx):
     cursor = cnx.cursor()
@@ -33,6 +36,13 @@ def getLastOrderId(cnx):
     else:
         return lastOrderInfo[0]
 
+
+def getCustomerNameFromID(cnx, customerId):
+    cursor = cnx.cursor()
+    query = 'SELECT customerName FROM customer where customerID = ' + str(customerId)
+    cursor.execute(query)
+    customerName = cursor.fetchone()
+    return customerName
 def isValidUser(cnx, email, passoword):
     cursor = cnx.cursor()
 
@@ -57,7 +67,7 @@ def showRestaurants(cnx):
     result = cursor.fetchall()
     print ('Restaurant ID       Restaurants:\n')
     for r in result:
-        print(str(r[0]) +'      '+ r[1] +'\n')
+        print(str(r[0]) +'              '+ r[1] +'\n')
     cursor.close()
 
 def isValidRestaurant(cnx, restaurantId):
@@ -69,6 +79,23 @@ def isValidRestaurant(cnx, restaurantId):
     else:
         return 1
 
+
+def getCustomerIDForOrder(cnx, orderID, restaurantId):
+    cursor = cnx.cursor(buffered=True)
+    query = "SELECT customerID from orders where orderID=" + str(orderID) + " and restaurantId=" + str(restaurantId)
+    cursor.execute(query)
+    customerIDTuple = cursor.fetchone()
+    cursor.close()
+    return customerIDTuple
+
+def orderReady(cnx, orderId, restaurantId):
+    cursor = cnx.cursor()
+    updateisReady = "UPDATE orderinfo SET isReady = 1 WHERE orderID=%s AND RestaurantID=%s"
+    values = (orderId, restaurantId)
+    cursor.execute(updateisReady, values)
+    cnx.commit()
+    cursor.close()
+
 def isValidItem(cnx, itemId, restaurantID):
     cursor = cnx.cursor()
     cursor.execute('SELECT * from Menu M where M.ItemID = '+ str(itemId) + ' and M.RestaurantID= ' + str(restaurantID))
@@ -78,6 +105,14 @@ def isValidItem(cnx, itemId, restaurantID):
     else:
         # return the price of the item
         return (1, fetchedItem[3])
+
+def getItemNameFromItemID(cnx, itemId, restaurantId):
+    cursor = cnx.cursor()
+    query = ('SELECT ItemName FROM Menu M, Restaurant R WHERE M.RestaurantID=R.RestaurantID AND R.RestaurantID=' + str(restaurantId) + ' AND M.ItemID=' + str(itemId))
+    cursor.execute(query)
+    resultItemName = cursor.fetchone()
+    cursor.close()
+    return resultItemName
 def showRItems(cnx, RSelect):
     # written by Jose
     cursor = cnx.cursor()
@@ -102,28 +137,51 @@ def addOrder(cnx, orderId, restaurantId, itemId, quantity, custId):
 
     cursor.close()
 
+def getOrdersForCustomer(cnx, customerID):
+    cursor = cnx.cursor()
+    query = 'SELECT orderID, ItemID, RestaurantID, Quantity FROM orders WHERE customerID=' + str(customerID)
+    cursor.execute(query)
+    allResultsList = cursor.fetchall()
+    cursor.close()
+    return allResultsList
+def getOrdersForRestaurant(cnx, restuarntId):
+    cursor = cnx.cursor()
+    query = ("SELECT * FROM orders where RestaurantID = " + restuarntId)
+    cursor.execute(query)
+    allResultsList = cursor.fetchall()
+    cursor.close()
+    return allResultsList
+
 
 def getLastNRowsFromOrdersTable(cnx, numRows):
     cursor = cnx.cursor()
     query = "SELECT * FROM orders ORDER BY orderID DESC LIMIT " + str(numRows)
     cursor.execute(query)
+    allResultsList = cursor.fetchall()
     cursor.close()
-    return cursor.fetchall()
+    return allResultsList
 def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
     # written by Tarun
     cursor = cnx.cursor()
     query_add_orderInfo = ("INSERT INTO orderinfo "
-                         "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID) "
-                         "VALUES (%s, %s, %s, %s, %s, %s, %s)")
+                         "(orderID, isReady, readyTime, totalPrice, isOrderPickedUp, RestaurantID) "
+                         "VALUES (%s, %s, %s, %s, %s, %s)")
     # orderExpirationDateTime = readyTime + 1 hr
     # we'll not implement expirationDateTime, instead we'll have a script/cronjob that runs at 3:00 am everyday and deletes all orders
-    values = (orderId, 0, readyTime, totalPrice, 0, readyTime, restaurantId)
+    values = (orderId, 0, readyTime, totalPrice, 0, restaurantId)
     cursor.execute(query_add_orderInfo, values)
     cnx.commit()
 
     cursor.close()
 
 
+def getReadyTimeForOrder(cnx, orderId, RestaurantID):
+    cursor = cnx.cursor(buffered=True)
+    query = 'SELECT readyTime from orderinfo where orderID=' + str(orderId) + ' AND RestaurantID=' + str(RestaurantID)
+    cursor.execute(query)
+    readyTimeTuple = cursor.fetchone()
+    cursor.close()
+    return readyTimeTuple
 def addAccount(cnx, balance):
     # written by Tarun
     cursor = cnx.cursor()
