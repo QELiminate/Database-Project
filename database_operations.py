@@ -169,19 +169,23 @@ def addCustomer(cnx, name, email, passWord):
 
     cursor.close()
 
-def cancelOrder(cnx, orderID):#cancel order (delete order and notify about cancellation) - written by Jose
+def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and notify about cancellation) - written by Jose
     #refund order
     cursor = cnx.cursor(buffered=True)
 
-    getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID))
+    getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID)+'AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getTotalPriceQuery)
     totalp = cursor.fetchone()[0]
     
-    getBalanceQuery = ('SELECT A.balance FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo')
+    if totalp==None:
+        print("Order Not Found. Please ensure Restaurant and Order IDs are both valid.")
+        return 0
+    
+    getBalanceQuery = ('SELECT A.balance FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+'AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getBalanceQuery)
     balan = cursor.fetchone()[0]
     
-    getAccountQuery = ('SELECT A.accountNo FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo')
+    getAccountQuery = ('SELECT A.accountNo FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+'AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getAccountQuery)
     AccountNo = cursor.fetchone()[0]
     
@@ -191,13 +195,13 @@ def cancelOrder(cnx, orderID):#cancel order (delete order and notify about cance
     updateBalanceQuery = ('UPDATE Account SET balance=' + str(balan) + ' WHERE AccountNo=' + str(AccountNo))
     cursor.execute(updateBalanceQuery)
 
-    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID))
+    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID)+'AND O.RestaurantID='+str(restaurantID))
     cursor.execute(deleteOrderQuery)
     cnx.commit()
     orderDeleteParityCheck(cnx)
     
     cursor.close()
-    print ('Order '+ str(orderID) +' has been canceled and refunded.\n')
+    print ('Order '+ str(orderID) +' from restaurant '+str(restaurantID)+' has been canceled and refunded.\n')
     
 #written by Jose
 def setOrderPickedup(cnx, ord):
