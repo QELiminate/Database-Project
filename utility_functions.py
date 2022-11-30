@@ -10,9 +10,13 @@ def hashPassword(password):
 def checkPassword(userEnteredPasswordStr, storedHash):
     userEnteredPasswordBytes = bytes(userEnteredPasswordStr, 'utf-8')
     storedHashBytes = bytes(storedHash, 'utf-8')
-    # print("userEnteredPasswordBytes , ", userEnteredPasswordBytes)
-    # print("storedHash: ", type(storedHash))
-    isPasswordSame = bcrypt.checkpw(userEnteredPasswordBytes, storedHashBytes)
+    #print("userEnteredPasswordBytes , ", userEnteredPasswordBytes)
+    #print("storedHashBytes: ", storedHashBytes)
+    salt = bcrypt.gensalt()
+    hash = bcrypt.hashpw(storedHashBytes, salt)
+    #isPasswordSame = bcrypt.checkpw(userEnteredPasswordBytes, storedHashBytes)
+    isPasswordSame = bcrypt.checkpw(userEnteredPasswordBytes, hash)
+    #print(isPasswordSame)
     return isPasswordSame
 
 

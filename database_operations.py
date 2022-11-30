@@ -5,7 +5,7 @@ import utility_functions
 
 
 def connectToDatabase():
-    cnx = mysql.connector.connect(user='root', password='',
+    cnx = mysql.connector.connect(user='root', password='Abc123()?',
                                   host='127.0.0.1', port='3306',
                                   database='app_schema')
     return cnx
@@ -21,8 +21,9 @@ def getLastOrderId(cnx):
 
 def isValidUser(cnx, email, passoword):
     cursor = cnx.cursor()
-
-    cursor.execute('SELECT * FROM customer where email ="' + email +'"')
+    query="SELECT * FROM customer where email ='" + email +"'"
+    #print(query)
+    cursor.execute(query)
     customerInfo = cursor.fetchone()
     if customerInfo is None:
         return -1
@@ -86,6 +87,18 @@ def addOrder(cnx, orderId, restaurantId, itemId, quantity):
 
     cursor.close()
 
+def addOrderNew(cnx, restaurantId, itemId, quantity):
+    # written by Tarun
+    cursor = cnx.cursor()
+    query_add_orders = ("INSERT INTO orders "
+                         "(ItemID, RestaurantID, Quantity) "
+                         "VALUES (%s, %s, %s, %s)")
+    values = (orderId, itemId, restaurantId, quantity)
+    cursor.execute(query_add_orders, values)
+    cnx.commit()
+
+    cursor.close()
+
 
 
 def addOrderInfo(cnx, totalPrice, readyTime, orderId, restaurantId):
@@ -135,13 +148,13 @@ def addCustomer(cnx, name, email, passWord):
 
     # first check if the email already exists
     emailexists = ("SELECT count(*) FROM customer WHERE email = e")
-    execute(emailexists)
-    if (emailexists == 1) {
+    cursor.execute(emailexists)
+    if emailexists == 1: 
         print("Your email already has an account.")
         n = input(" \n Please enter your Name: \n ")
         e = input(" \n Please enter the email: \n ")
         p = input("\n Please enter the password: \n ")
-    }
+    
 
     # we'll need a function to ask how much money they want to put in their account, maybe implement payments -> currently giving a hardcoded value
     account_number = addAccount(cnx, 0)

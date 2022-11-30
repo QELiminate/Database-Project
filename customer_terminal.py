@@ -1,5 +1,14 @@
 import database_operations
 
+cnx=database_operations.connectToDatabase()
+
+def checkCustomer(username, password):
+    result=database_operations.isValidUser(cnx, username, password)
+    #if result = 1, then username/password is valid
+    #if result = -1, no such user
+    #if result = -2, user exists, but pass does not match
+    return result
+
 def registerCustomer(name, email, passWord):
     # hash the password and then store
     connectionObj = database_operations.connectToDatabase()
@@ -26,24 +35,28 @@ def insertRestaurant():
     cnx.commit();
 
 
-def placeOrderCustomer():
-    cursor = cnx.cursor()
-    restaurantsID = ('SELECT RestaurantID FROM Restaurant')
-    rID = (RestaurantID)
-    #cursor.execute(restaurantsID, rID)
-    itemsID = ("SELECT ItemID FROM Menu")
-    iID = (ItemID)
-    placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID WHERE ItemID = itemsID")
-    cursor.execute(placingOrder, rID)
-    #cursor.execute(itemsID, iID)#here
-    cnx.commit();
+def placeOrderCustomer(restaurantId, itemId, quantity):
+    database_operations.addOrderNew(cnx, restaurantId, itemId, quantity)
+
+
+#def placeOrderCustomer(rID, itemID):
+#    cursor = cnx.cursor()
+#    restaurantsID = ('SELECT RestaurantID FROM Restaurant')
+#    cursor.execute(restaurantsID, rID)
+#    rID=cursor.fetchall()
+#    itemsID = ("SELECT ItemID FROM Menu")
+#    iID = (ItemID)
+#    placingOrder = ("UPDATE Orders SET RestaurantID = restaurantsID WHERE ItemID = itemsID")
+#    cursor.execute(placingOrder, rID)
+#    #cursor.execute(itemsID, iID)#here
+#    cnx.commit();
 
 def checkStatusOrder():
     cursor = cnx.cursor()#test
     status = ("SELECT isOrderPickedUp FROM Orders")
     pickedup = (isOrderPickedUp)
     cursor.execute(status, pickedup)
-    if cursor.fetchone() is 0:
+    if cursor.fetchone() == 0:
         return -1
     return 1
     cnx.commit();
@@ -54,20 +67,36 @@ def payment():
     cost = (balance)
     cursor.execute(payment, cost);
     cnx.commit();
+
 if __name__ == '__main__':
+    
+    cursorMain=cnx.cursor()
     print("\n Hello, Welcome to QElim. \n PLease Sign In/Sign Up to place an order \n")
     isUserRegisteredInput = input("\n If you're already a registered user? Y/N \n")
 
     if isUserRegisteredInput == "Y":
         # ask user to enter username /password
-        username = input(" \n Please enter your username: \n ")
+        username = input(" \n Please enter your username (email address): \n ")
         passWord = input("\n Please enter your password: \n")
         # check if the user is registered
-        if username == ("SELECT (customer.email) FROM Account") && password == ("SELECT (customer.pass) FROM Account"):
+        if checkCustomer(username,passWord) == 1:
+     #   if username == ("SELECT (email) FROM Customer") and passWord == ("SELECT (pass) FROM Customer"):
             choice = input("\n What operation would you like to perform? \n 1. Place an order \n 2. Check status of your order \n ")
+            choice=int(choice)
             if choice == 1:
-                order = input("\n Enter your order: \n")
-                placeOrderCustomer()
+                listoforders = ("SELECT ItemId, RestaurantID, ItemName FROM menu")
+                cursorMain.execute(listoforders)
+                menuItemList=cursorMain.fetchall()
+                for item in menuItemList:
+                    itemId=item[1]
+                    restaurantID=item[2]
+                    itemName=item[3]
+                    print(itemId, RestaurantID, ItemName)
+                
+                itemId=input("\nEnter Item Id\n")
+                restaurantID=input("\nEnter Restaurant Id\n")
+                quantity=input("\nquantity\n")
+                placeOrderCustomer(RestaurantId, itemId, quantity)
             if choice == 2:
                 checkStatusOrder()
     else:
@@ -77,13 +106,15 @@ if __name__ == '__main__':
         passWord = input("\n Please enter the password: \n ")
 
         emailexists = ("SELECT count(*) FROM customer WHERE email = e")
-        execute(emailexists)
-        if (emailexists == 1) {
+        cursor.execute(emailexists)
+        print(emailexists)
+ #       quit()
+        if emailexists == 1:
             print("Your email already has an account.")
             n = input(" \n Please enter your Name: \n ")
             e = input(" \n Please enter the email: \n ")
             p = input("\n Please enter the password: \n ")
-        }
+        
 
         execute("INSERT INTO customer (customerName, email, pass)")
 
@@ -101,5 +132,5 @@ if __name__ == '__main__':
         # Megan
         # payment and place order
 
-
+cnx.close()
 
