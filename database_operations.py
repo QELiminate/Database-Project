@@ -260,10 +260,10 @@ def payOrder(cnx, total, customerID):
     #access account balance
     getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=' + str(customerID))
     cursor.execute(getAccountNoQuery)
-    AccountNo = cursor.fetchone()
+    AccountNo = cursor.fetchone()[0]
     getBalanceQuery = ('SELECT balance FROM Account A WHERE A.AccountNo=' + str(AccountNo))
     cursor.execute(getBalanceQuery)
-    balance = cursor.fetchone()
+    balance = cursor.fetchone()[0]
     balance = float(balance)
     total = float(total)
     #if, order total is greater than account balance, then decline order
@@ -282,6 +282,32 @@ def payOrder(cnx, total, customerID):
         cursor.close()
         return True
     
+
+#view and add money to account balance - written by Jose
+def balanceFunc(cnx, customerID):
+    cursor = cnx.cursor()
+    #access account balance
+    getAccountNoQuery = ('SELECT A.AccountNo FROM Account A, Customer C WHERE A.AccountNo=C.AccountNo AND C.customerID=' + str(customerID))
+    cursor.execute(getAccountNoQuery)
+    AccountNo = cursor.fetchone()[0]
+    getBalanceQuery = ('SELECT balance FROM Account A WHERE A.AccountNo=' + str(AccountNo))
+    cursor.execute(getBalanceQuery)
+    balance = cursor.fetchone()[0]
+    balance = float(balance)
+    print("Current account balance: $" + str(balance) + "\n")
+    command = input("Would you like to change your account balance? Y/N: \n")
+    if command == 'Y':
+        newbalance = input("Enter amount to be added or subtracted: \n")
+        newbalance=float(newbalance)
+        balance+=newbalance
+        updateBalanceQuery = ('UPDATE Account SET balance=' + str(balance) + ' WHERE AccountNo=' + str(AccountNo))
+        cursor.execute(updateBalanceQuery)
+        cnx.commit()
+        if newbalance<0:
+            print("$"+str(newbalance)+" subtracted from your account.")
+        else:
+            print("$"+str(newbalance)+" added to your account.")
+        print("New balance is: $"+str(balance))
 
 if __name__ == '__main__':
     cnx = connectToDatabase()
