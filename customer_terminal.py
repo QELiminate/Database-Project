@@ -82,7 +82,7 @@ if __name__ == '__main__':
             # show restaurants
                 while True:
                     choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3.Check status of your order"+ 
-                                   "\n 4. Cancel an Order \n 5. Exit \n ")
+                                   "\n 4. Cancel an Order \n 5. Exit \n 6. Access your Account")
 
                     if choice == '1':
                         displayRestaurants()
@@ -166,6 +166,8 @@ if __name__ == '__main__':
                                    
                     elif choice == '5':
                         sys.exit()
+                    elif choice == '6':
+                        database_operations.balanceFunc(cnx,customerId)
             else:
                 print(stringValAndCustId[0])
                 continue
