@@ -173,7 +173,7 @@ def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and noti
     #refund order
     cursor = cnx.cursor(buffered=True)
 
-    getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID)+'AND O.RestaurantID='+str(restaurantID))
+    getTotalPriceQuery = ('SELECT O.totalPrice FROM orderinfo O WHERE O.orderID=' + str(orderID)+' AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getTotalPriceQuery)
     totalp = cursor.fetchone()[0]
     
@@ -181,11 +181,11 @@ def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and noti
         print("Order Not Found. Please ensure Restaurant and Order IDs are both valid.")
         return 0
     
-    getBalanceQuery = ('SELECT A.balance FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+'AND O.RestaurantID='+str(restaurantID))
+    getBalanceQuery = ('SELECT A.balance FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+' AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getBalanceQuery)
     balan = cursor.fetchone()[0]
     
-    getAccountQuery = ('SELECT A.accountNo FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+'AND O.RestaurantID='+str(restaurantID))
+    getAccountQuery = ('SELECT A.accountNo FROM account A, orders O, customer C WHERE O.orderID=' + str(orderID)+' AND O.customerID=C.customerID AND C.accountNo=A.accountNo'+' AND O.RestaurantID='+str(restaurantID))
     cursor.execute(getAccountQuery)
     AccountNo = cursor.fetchone()[0]
     
@@ -195,7 +195,7 @@ def cancelOrder(cnx, orderID, restaurantID):#cancel order (delete order and noti
     updateBalanceQuery = ('UPDATE Account SET balance=' + str(balan) + ' WHERE AccountNo=' + str(AccountNo))
     cursor.execute(updateBalanceQuery)
 
-    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID)+'AND O.RestaurantID='+str(restaurantID))
+    deleteOrderQuery = ('DELETE FROM orders WHERE orderID=' + str(orderID)+' AND O.RestaurantID='+str(restaurantID))
     cursor.execute(deleteOrderQuery)
     cnx.commit()
     orderDeleteParityCheck(cnx)
