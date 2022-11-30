@@ -143,7 +143,7 @@ if __name__ == "__main__" :
             elif choice == '3':
                 #cancel order - written by Jose
                 ordertocancel = input("Type order ID of order to be cancelled: \n")
-                database_operations.cancelOrder(connObj, ordertocancel)
+                database_operations.cancelOrder(connObj, ordertocancel, restaurantId)
                 continue    
             elif choice == '4':
                 #mark order as picked up - written by Jose
