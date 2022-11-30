@@ -128,10 +128,10 @@ if __name__ == '__main__':
                                 total = totalPriceOrder+tax
                                 paid = database_operations.payOrder(cnx, total,customerId)
                                 if paid==False:
-                                    database_operations.cancelOrder(cnx, currOrderNumber)
+                                    database_operations.cancelOrder(cnx, currOrderNumber, restaurantId)
                                     continue
                             elif payment == 'cancel':
-                                database_operations.cancelOrder(cnx, currOrderNumber)
+                                database_operations.cancelOrder(cnx, currOrderNumber, restaurantId)
                                 continue
                             #Jose code end
 
@@ -159,8 +159,9 @@ if __name__ == '__main__':
 
                     elif choice == '4':
                                    #cancel order - written by Jose
+                                   restcancel = input("Type restaurant ID of the order to be cancelled: \n")
                                    ordertocancel = input("Type order ID of order to be cancelled: \n")
-                                   database_operations.cancelOrder(cnx, ordertocancel)
+                                   database_operations.cancelOrder(cnx, ordertocancel, restcancel)
                                    continue
                                    
                     elif choice == '5':
