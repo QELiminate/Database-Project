@@ -1,0 +1,113 @@
+/*Entities*/
+CREATE TABLE `account` (
+  `accountNo` int NOT NULL AUTO_INCREMENT,
+  `balance` decimal(8,2) NOT NULL,
+  PRIMARY KEY (`accountNo`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `restaurant` (
+  `RestaurantID` int NOT NULL AUTO_INCREMENT,
+  `restaurantName` varchar(100) NOT NULL,
+  PRIMARY KEY (`RestaurantID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `customer` (
+  `customerID` int NOT NULL AUTO_INCREMENT,
+  `customerName` varchar(50) NOT NULL,
+  `accountNo` int NOT NULL,
+  `email` varchar(320) NOT NULL,
+  `pass` varchar(320) NOT NULL,
+  PRIMARY KEY (`customerID`),
+  KEY `accountNo` (`accountNo`),
+  CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`accountNo`) REFERENCES `account` (`accountNo`)
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `menu` (
+  `ItemID` int NOT NULL AUTO_INCREMENT,
+  `RestaurantID` int NOT NULL,
+  `ItemName` varchar(100) NOT NULL,
+  `Price` float NOT NULL,
+  PRIMARY KEY (`ItemID`,`RestaurantID`),
+  KEY `RestaurantID` (`RestaurantID`),
+  CONSTRAINT FOREIGN KEY (`RestaurantID`) REFERENCES `restaurant` (`RestaurantID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `orders` (
+  `orderID` int NOT NULL AUTO_INCREMENT,
+  `ItemID` int NOT NULL,
+  `RestaurantID` int NOT NULL,
+  `customerID` int NOT NULL,
+  `Quantity` int NOT NULL,
+  PRIMARY KEY (`orderID`,`ItemID`,`RestaurantID`,`customerID`),
+  KEY `ItemID` (`ItemID`),
+  KEY `RestaurantID` (`RestaurantID`),
+  KEY `customerID` (`customerID`),
+  CONSTRAINT FOREIGN KEY (`ItemID`) REFERENCES `menu` (`ItemID`),
+  CONSTRAINT FOREIGN KEY (`RestaurantID`) REFERENCES `restaurant` (`RestaurantID`),
+  CONSTRAINT FOREIGN KEY (`customerID`) REFERENCES `customer` (`customerID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+CREATE TABLE `orderinfo` (
+  `orderID` int NOT NULL AUTO_INCREMENT,
+  `isReady` tinyint(1) NOT NULL,
+  `readyTime` datetime NOT NULL,
+  `totalPrice` decimal(6,2) NOT NULL,
+  `isOrderPickedUp` tinyint(1) NOT NULL,
+  `orderExpirationDateTime` datetime NOT NULL,
+  `RestaurantID` int NOT NULL,
+  PRIMARY KEY (`orderID`,`RestaurantID`),
+  KEY `RestaurantID` (`RestaurantID`),
+  CONSTRAINT FOREIGN KEY (`RestaurantID`) REFERENCES `restaurant` (`RestaurantID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+
+TEST DATA
+INSERT INTO restaurant (RestaurantID, restaurantName)
+VALUES 
+	(1001, 'Mcdonalds'),
+    (1002, 'Dennys');
+
+INSERT INTO menu (ItemID, RestaurantID, ItemName, Price)
+VALUES 
+	(1, 1001,'Burger',6.99),
+    (2, 1001,'Fries',3.75),
+    (3, 1001,'Soda',2.50),
+    (4, 1002,'Pancakes',12.45),
+    (5, 1002,'Milkshake',4.00),
+    (6, 1002,'Omellete',15.20);
+INSERT INTO account (accountNo, balance)
+VALUES 
+	(1, 50.00),
+    (2, 20.55);
+
+/*The unhashed passwords are ‘x’ and ‘y’ respectively.*/
+INSERT INTO customer (customerID, customerName, accountNo, email, pass)
+VALUES 	(109,'John',1,'john27@aol.com','$2b$12$LilQGpaxEwdONBqq89oxSOSPUE6uY9RBTYvK9Fxx397mPgqFw56Jq'),
+    (108,'Jake',2,'statefarm@gmail.com',
+$2b$12$K16e4yUGiS3uuMdS6q43feIWLEDecbl1HDEvbiKza0y1BqxPtiQ0O
+
+);
+
+
+INSERT INTO orderinfo (orderID, isReady, readyTime, totalPrice, isOrderPickedUp, orderExpirationDateTime, RestaurantID)
+VALUES 
+	(9,0,'2023-01-06 12:25:34', 18.24, 0, '2023-02-06 12:25:34', 1001),
+    (8,0,'2023-03-06 12:25:34', 28.90, 0, '2023-04-06 12:25:34', 1002);
+
+
+INSERT INTO orders (orderID, ItemID, RestaurantID, customerID, Quantity)
+VALUES 
+	(9, 1, 1001, 109, 1),
+    (9, 2, 1001, 109, 3),
+    (8, 4, 1002, 108, 2),
+    (8, 5, 1002, 108, 1);
+
+
+
+
+
