@@ -401,6 +401,4 @@ def balanceFunc(cnx, customerID):
         print("$"+str(newbalance)+" added to your account.")
         print("New balance is: $"+str(balance))
 
-if __name__ == "__main__":
-    cnx = connectToDatabase()
-    payOrder(cnx, 18, 107)
+
