@@ -27,3 +27,5 @@ Configuration Steps:
 
 
 
+Link to CREATE TABLES document to create the MySQL Database. Also includes INSERT VALUES at the end of the document for testing code. 
+https://docs.google.com/document/d/1BakATbty1SU_b_gbNLNo9xTxzI-OOmsd0AGQE274K3g/edit?usp=sharing

@@ -42,7 +42,10 @@ def lastOrderInfo():
     connObj.close()
     return (orderInfoList[0][0], orderInfoList[0][2], totalPayment)
 
-
+def clearPickedOrders():
+    connObj = database_operations.connectToDatabase()
+    database_operations.clearPickedOrders(connObj)
+    connObj.close()
 def getAllOrdersForRestaurant(restaurantId):
     connObj = database_operations.connectToDatabase()
     allOrders = database_operations.getOrdersForRestaurant(connObj, restaurantId)
@@ -59,7 +62,7 @@ def getAllOrdersForRestaurant(restaurantId):
         customerId = allOrders[i][3]
 
         customerNameTuple = database_operations.getCustomerNameFromID(connObj, customerId)
-        print("\n \n Order for " + customerNameTuple[0] + "\n")
+        print("\n \nOrder for " + customerNameTuple[0] + "\n")
         # get the order(s) for the customer
 
         while i < len(allOrders) and allOrders[i][3] == customerId:
@@ -94,10 +97,19 @@ def getAllOrdersForRestaurant(restaurantId):
             i += 1
 
 def checkForValidRestaurantID(restaurantId):
-
     connObj = database_operations.connectToDatabase()
     return_value = database_operations.isValidRestaurant(connObj, restaurantId)
+    connObj.close()
     return return_value
+
+def setOrderPickedup(orderId):
+    connObj = database_operations.connectToDatabase()
+    database_operations.setOrderPickedup(connObj, orderId)
+    connObj.close()
+def cancelOrder(orderId, restaurantId):
+    connObj = database_operations.connectToDatabase()
+    database_operations.cancelOrder(connObj, orderId, restaurantId)
+    connObj.close()
 
 def notifyCustomerOrderReady(orderId, restaurantId):
 
@@ -116,8 +128,6 @@ def notifyCustomerOrderReady(orderId, restaurantId):
     print("\n Hello " + customerNameTuple[0] + " your order number " + str(orderId) + " with the restaurant " + restaurantNameTuple[0] + " is ready \n")
     return 1
 if __name__ == "__main__" :
-
-
     while True:
         print("\nRestaurant View\n")
         restaurantId = input("\nEnter your restaurant ID\n")
@@ -126,7 +136,7 @@ if __name__ == "__main__" :
             continue
         returnValue = checkForValidRestaurantID(restaurantId)
         if returnValue == 1:
-            choice = input("What operation would you like to perform: \n 1. View all orders  \n 2. Notify the customer that order is ready \n 3. Update the ready time for an order \n 4. Cancel an order \n 5. Update the order pickup status \n 6. Exit \n")
+            choice = input("What operation would you like to perform: \n 1. View all orders  \n 2. Notify the customer that order is ready \n 3. Cancel an order \n 4. Update the order pickup status \n 5. Clear picked up orders \n 6. Exit \n")
 
             if choice == '1':
                 # get all the orders for the restaurant
@@ -137,36 +147,24 @@ if __name__ == "__main__" :
                 if returnValue is None:
                     print("Order ID doesn't exist")
                     continue
+
+            elif choice == '3':
+                #cancel order - written by Jose
+                ordertocancel = input("Type order ID of order to be cancelled: \n")
+                cancelOrder(ordertocancel, restaurantId)
+                continue
+            elif choice == '4':
+                #mark order as picked up - written by Jose
+                orderId = input("Enter the order number to mark as picked up: \n")
+                setOrderPickedup(orderId)
+                continue
             elif choice == '5':
+                #clear all orders marked as picked up - written by Jose
+                clearPickedOrders()
+                continue
+            elif choice == '6':
                 sys.exit()
         else:
             print("Invalid Restaurant ID")
 
-
-
-#
-#     lastOrderInfo()
-    # print("New Order\n")
-    # newOrderCameIn.has_been_called = False\
-    # while True:
-    #     # if newOrderCameIn() is called then print here something
-    #
-    #     if newOrderCameIn:
-    #         print("hello")
-        # newOrderCameIn.has_been_called = False
-    # after the order is placed -> entry is done in the Orders table
-    # restaurant will see the order ->
-    # restaurant will enter the preparation time for the order - for now
-    #
-        # print("New Order\n")
-        # orderId, restaurantId, totalPayment = lastOrderInfo()
-
-        #
-        # # we also need the name of the customer who made the order
-        #
-        # # insert into orderinfo values (1, 0, '2022-01-01 22:23:24', 34, 0, '2022-01-01 22:23:24', 1000)
-        # # readyDateTimeObj = datetime.strptime(readyDateTime, '%Y-%m-%d %H:%M:%S')
-        # registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
-    # communicateDateTime(readyDateTime)
-    # insert the order into Orders Info with ready Time, order Id, restaurant id
 

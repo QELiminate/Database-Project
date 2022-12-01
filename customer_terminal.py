@@ -6,7 +6,6 @@ import time
 import restaurant_terminal
 
 
-
 def registerCustomer(name, email, passWord):
     # hash the password and then store
     validEmail = utility_functions.isValidEmail(email)
@@ -17,16 +16,37 @@ def registerCustomer(name, email, passWord):
     database_operations.addCustomer(connectionObj, name, email, hashedPass)
     return 1
 
-def registerOrder(orderId, itemId, restaurantId, qty,custId):
+
+def payOrder(totalPrice, customerId):
+    connectionObj = database_operations.connectToDatabase()
+    return_val = database_operations.payOrder(connectionObj, totalPrice, customerId)
+    connectionObj.close()
+    return return_val
+
+def balanceFunc(customerId):
+    connectionObj = database_operations.connectToDatabase()
+    database_operations.balanceFunc(connectionObj, customerId)
+    connectionObj.close()
+
+def cancelOrder(orderId, restaurantId):
+    connectionObj = database_operations.connectToDatabase()
+    database_operations.cancelOrder(connectionObj, orderId, restaurantId)
+    connectionObj.close()
+
+
+def registerOrder(orderId, itemId, restaurantId, qty, custId):
     connectionObj = database_operations.connectToDatabase()
     database_operations.addOrder(connectionObj, orderId, restaurantId, itemId, qty, custId)
     connectionObj.close()
+
 
 def isRegisteredRestaurant(restId):
     connectionObj = database_operations.connectToDatabase()
     return_val = database_operations.isValidRestaurant(connectionObj, restId)
     connectionObj.close()
     return return_val
+
+
 def fetchOrdersForCustomer(customerId):
     connObj = database_operations.connectToDatabase()
     allOrdersList = database_operations.getOrdersForCustomer(connObj, customerId)
@@ -51,30 +71,36 @@ def fetchOrdersForCustomer(customerId):
         if readyTimeTuple[0] is None:
             readyTimeTuple = ('Not yet added by restaurant')
 
-        print("\n " + str(orderTuple[0]) + "        " + str(restaurantNameTuple[0]) + "         " + str(itemNameTuple[0]) + "           " + str(orderTuple[3]) + "          " + str(readyTimeTuple[0]) + "\n")
+        print("\n " + str(orderTuple[0]) + "        " + str(restaurantNameTuple[0]) + "         " + str(
+            itemNameTuple[0]) + "           " + str(orderTuple[3]) + "          " + str(readyTimeTuple[0]) + "\n")
 
 
 def lastOrderId():
     connectionObj = database_operations.connectToDatabase()
     lastOrderNumber = database_operations.getLastOrderId(connectionObj)
     return lastOrderNumber
+
+
 def isRegisteredItem(itemId, restuarantId):
     connectionObj = database_operations.connectToDatabase()
     return_val = database_operations.isValidItem(connectionObj, itemId, restuarantId)
     connectionObj.close()
     return return_val
 
+
 def displayRestaurants():
     connectionObj = database_operations.connectToDatabase()
     database_operations.showRestaurants(connectionObj)
     connectionObj.close()
+
 
 def showItems(restaurantId):
     connectionObj = database_operations.connectToDatabase()
     database_operations.showRItems(connectionObj, restaurantId)
     connectionObj.close()
 
-def isRegisteredCustomer(email,password):
+
+def isRegisteredCustomer(email, password):
     connectionObj = database_operations.connectToDatabase()
     return_value = database_operations.isValidUser(connectionObj, email, password)
     if return_value[0] == -1:
@@ -103,20 +129,20 @@ if __name__ == '__main__':
             if stringValAndCustId[0] == "Registered User":
                 customerId = stringValAndCustId[1]
                 customerName = stringValAndCustId[2]
-            # if the user is registered then sign in
-            # show restaurants
+                # if the user is registered then sign in
+                # show restaurants
                 while True:
-                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3. View your orders \n 4. Exit \n ")
+                    choice = input("\n What operation would you like to perform? \n 1. Show Restaurants \n 2. Place an order \n 3. View your orders \n 4. Cancel an Order \n 5. Access your Account \n 6. Exit \n ")
 
                     if choice == '1':
                         displayRestaurants()
                         continue
-                    elif choice == '2':
+                    elif choice == '2' :
                         restaurantId = input("Enter the restaurant id in which you would like to place the order in\n")
                         # check if it is a valid restaurantId
                         returnValRegisteredRestaurant = isRegisteredRestaurant(restaurantId)
                         if returnValRegisteredRestaurant == -1:
-                            print("The restaurant ID is invalid, please enter a valid restaurant id")
+                            print("The restaurant ID is invalid, please enter a valid restaurant id\n")
                             continue
                         elif returnValRegisteredRestaurant == 1:
                             # show the items in the restaurant
@@ -127,56 +153,86 @@ if __name__ == '__main__':
                             currOrderNumber = lastOrderNumber + 1
                             totalPriceOfOrder = 0
                             numberOfRowsInsertedInOrdersTable = 0
+                            orderNumberAndItemIdsAndQtyList = []
                             while True:
-                                itemIdAndQty = input("Enter the item id and its corresponding quantity separated by a space, once you're done please enter 2\n")
+                                itemIdAndQty = input(
+                                    "Enter the item id and its corresponding quantity separated by a space, once you're done please enter 2\n")
                                 if itemIdAndQty == '':
                                     print("Please enter a valid value")
                                     continue
                                 if itemIdAndQty == '2':
                                     break
+
                                 itemQtyArr = itemIdAndQty.split(' ')
+                                if len(itemQtyArr) != 2:
+                                    print("Invalid input")
+                                    continue
                                 # qty should be an integer
                                 # item id should be valid
-                                itemAlreadyPresent = isRegisteredItem(itemQtyArr[0],restaurantId)
+                                itemAlreadyPresent = isRegisteredItem(itemQtyArr[0], restaurantId)
                                 if itemAlreadyPresent[0] == -1:
-                                    print("The item ID is invalid, please enter a valid item ID")
+                                    print("The item ID is invalid, please enter a valid item ID\n")
                                     continue
                                 elif itemAlreadyPresent[0] == 1:
-                                    registerOrder(currOrderNumber, itemQtyArr[0], restaurantId, itemQtyArr[1], customerId)
+                                    orderNumberAndItemIdsAndQtyList.append((currOrderNumber, itemQtyArr[0], itemQtyArr[1]))
                                     totalPriceOfOrder += itemAlreadyPresent[1] * int(itemQtyArr[1])
                                     numberOfRowsInsertedInOrdersTable += 1
 
                             tax = 0.1 * totalPriceOfOrder
                             print("The total amount is ", totalPriceOfOrder + tax)
-                            print("Please choose a method of payment")
-                            # implement payment methods
+                            # Jose code start
+                            payment = input("\ntype pay to process payment or cancel to cancel order: \n")
+                            if payment == 'pay':
+                                # implement payment methods
+                                total = totalPriceOfOrder + tax
+                                paid = payOrder(total, customerId)
+                                if paid:
+                                    for i in range(len(orderNumberAndItemIdsAndQtyList)):
+                                        orderId = orderNumberAndItemIdsAndQtyList[i][0]
+                                        itemId = orderNumberAndItemIdsAndQtyList[i][1]
+                                        quantity = orderNumberAndItemIdsAndQtyList[i][2]
+                                        registerOrder(orderId, itemId, restaurantId, quantity,
+                                                      customerId)
+                                else:
+                                    continue
+                            elif payment == 'cancel':
+                                continue
+                            # Jose code end
 
                             print("\n Order successfully placed, we'll shortly send you the estimated time for your order pickup \n")
 
-                            # create a trigger here for restaurant to get information of the order
-                            # select the last numberOfRowsInsertedInOrdersTable from orders table
                             print("\n Restaurant View \n")
-                            print("\n New Order for "+ customerName + "\n")
+                            print("\n New Order for " + customerName + "\n")
                             orderId, restaurantId, totalPayment = restaurant_terminal.lastOrderInfo()
-                            readyDateTime = input("\nPlease enter the ready date(YYYY-MM-DD) and time(hh:mm:ss) for the order separated by space\n")
+                            readyDateTime = input(
+                                "\nPlease enter the ready date(YYYY-MM-DD) and time(hh:mm:ss) for the order separated by space\n")
                             restaurant_terminal.registerOrderInfo(orderId, restaurantId, totalPayment, readyDateTime)
+
                             print("\n Customer View\n ")
                             print("Your order's estimated time for pickup is: \n")
                             dateTimeObj = utility_functions.parseStrToDateTimeObj(readyDateTime)
-                            print("\n Date: " + str(dateTimeObj.month) + "-" + str(dateTimeObj.day) + "-" + str(dateTimeObj.year))
+                            print("\n Date: " + str(dateTimeObj.month) + "-" + str(dateTimeObj.day) + "-" + str(
+                                dateTimeObj.year))
                             print("\n Time in 24 hour format: \n")
                             print(str(dateTimeObj.hour) + ":" + str(dateTimeObj.minute))
-
-
-                            # after every 5 sec check if order id is there in ordersInfo, if it is then get the ready time
-                            # if the ready time is returned exit the terminal
-
 
                     elif choice == '3':
                         fetchOrdersForCustomer(customerId)
 
                     elif choice == '4':
+                        # cancel order - written by Jose
+                        restcancel = input("Type restaurant ID of the order to be cancelled: \n")
+                        ordertocancel = input("Type order ID of order to be cancelled: \n")
+                        cancelOrder(ordertocancel, restcancel)
+                        continue
+
+                    elif choice == '5':
+                        balanceFunc(customerId)
+                    elif choice == '6':
                         sys.exit()
+                    else:
+                        print("\n Invalid value entered \n")
+                        continue
             else:
                 print(stringValAndCustId[0])
                 continue
@@ -188,7 +244,7 @@ if __name__ == '__main__':
 
             # check if the user is registered
             strVal = isRegisteredCustomer(email, passWord)
-            if strVal == "Registered User" or strVal=="Invalid password":
+            if strVal == "Registered User" or strVal == "Invalid password":
 
                 print("The user is already registered please sign in to continue")
                 continue
@@ -202,10 +258,3 @@ if __name__ == '__main__':
                     continue
                 else:
                     print("Registration successful, please Sign In to continue")
-
-
-
-
-
-
-
