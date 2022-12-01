@@ -24,3 +24,10 @@ Steps to run the project:
 9. Once done with working with all the functions in customer_terminal.py go ahead and run the following command to work with functions that restaurant has <br>
     <br>
     python3 restaurant_terminal.py
+
+If you have any questions please reach out to us on the following emails:
+<br>
+tkukreja@horizon.csueastbay.edu
+<br> 
+jmorenosoria@horizon.csueastbay.edu
+<br> 
