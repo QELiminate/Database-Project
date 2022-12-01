@@ -104,7 +104,6 @@ if __name__ == '__main__':
         n = input(" \n Please enter your Name: \n ")
         e = input(" \n Please enter the email: \n ")
         p = input("\n Please enter the password: \n ")
-        print("test")
         emailexists = ("SELECT count(*) FROM customer WHERE email = %s")
         executeemail = (e)
         cursorMain.execute(emailexists, (executeemail,))
@@ -116,11 +115,13 @@ if __name__ == '__main__':
             e = input(" \n Please enter the email: \n ")
             p = input("\n Please enter the password: \n ")
         
-        print(n)
-        print(e)
-        print(p)
-        signedup = ("INSERT INTO customer (customerName, email, pass) VALUES (%s, %s, %s)")
-        signupinfo = (n, e, p)
+        accountcreation = ("INSERT INTO account (balance) VALUES %d")
+        starterValue = 0.00
+        cursorMain.execute(accountcreation,(starterValue))
+        accountNum = cursorMain.execute("SELECT accountNo FROM account WHERE balance = %d")
+        print(accountNum)
+        signedup = ("INSERT INTO customer (accountNo, customerName, email, pass) VALUES (%d, %s, %s, %s)")
+        signupinfo = (accountNum, n, e, p)
         cursorMain.execute(signedup, (signupinfo))
         # we'll have to see how to create functions for payments
 
