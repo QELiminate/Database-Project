@@ -9,11 +9,11 @@ def checkCustomer(username, password):
     #if result = -2, user exists, but pass does not match
     return result
 
-def registerCustomer(name, email, passWord):
-    # hash the password and then store
-    connectionObj = database_operations.connectToDatabase()
-    database_operations.addCustomer(connectionObj, name, email, passWord)
-    cnx.commit();
+#def registerCustomer(name, email, passWord):
+#    # hash the password and then store
+#    connectionObj = database_operations.connectToDatabase()
+#    database_operations.addCustomer(connectionObj, name, email, passWord)
+#    cnx.commit();
 
 def insertToMenu():
     cursor = cnx.cursor()
@@ -100,32 +100,17 @@ if __name__ == '__main__':
             if choice == 2:
                 checkStatusOrder()
     else:
-        # sign up the user
-        n = input(" \n Please enter your Name: \n ")
-        e = input(" \n Please enter the email: \n ")
-        p = input("\n Please enter the password: \n ")
-        emailexists = ("SELECT count(*) FROM customer WHERE email = %s")
-        executeemail = (e)
-        cursorMain.execute(emailexists, (executeemail,))
-        #print(emailexists)
- #       quit()
-        if emailexists == 1:
-            print("Your email already has an account.")
-            n = input(" \n Please enter your Name: \n ")
-            e = input(" \n Please enter the email: \n ")
-            p = input("\n Please enter the password: \n ")
-        
-        accountcreation = ("INSERT INTO account (balance) VALUES %d")
-        starterValue = 0.00
-        cursorMain.execute(accountcreation,(starterValue))
-        accountNum = cursorMain.execute("SELECT accountNo FROM account WHERE balance = %d")
-        print(accountNum)
-        signedup = ("INSERT INTO customer (accountNo, customerName, email, pass) VALUES (%d, %s, %s, %s)")
-        signupinfo = (accountNum, n, e, p)
-        cursorMain.execute(signedup, (signupinfo))
+        #cursorMain.execute(accountcreation,(starterValue))
+        #cursorMain.execute("SELECT accountNo FROM account WHERE balance = %d", (starterValue))
+        #accountNum=cursorMain.fetchone()
+        #print(accountNum)
+        #signedup = ("INSERT INTO customer (accountNo, customerName, email, pass) VALUES (%d, %s, %s, %s)")
+        #signupinfo = (accountNum, n, e, p)
+        #cursorMain.execute(signedup, (signupinfo))
         # we'll have to see how to create functions for payments
 
-        registerCustomer(n, e, p)
+        #registerCustomer(n, e, p)
+        database_operations.addCustomerNew(cnx)
 
 
         # Jose

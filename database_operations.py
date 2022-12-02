@@ -128,17 +128,18 @@ def addAccount(cnx, balance):
     cursor.close()
 
     cursor = cnx.cursor()
-    count_number_of_accounts_query = "SELECT COUNT(*) FROM account"
+    count_number_of_accounts_query = "SELECT MAX(accountNo) FROM account"
     cursor.execute(count_number_of_accounts_query)
-    numberofRows = cursor.fetchone()[0]
+    account_number = cursor.fetchone()[0]
 
     # numberofRows is equal to the account number recently created
-    account_number = numberofRows
+    # numberofRows not necessary equal to account number recently created, MAX(accountNo) is
+    #account_number = numberofRows
 
     cursor.close()
 
     return account_number
-def addCustomer(cnx, name, email, passWord):
+def addCustomer(cnx,name, email, passWord):
     # written by Tarun
     cursor = cnx.cursor()
     # first create an account
@@ -149,6 +150,42 @@ def addCustomer(cnx, name, email, passWord):
     # first check if the email already exists
     emailexists = ("SELECT count(*) FROM customer WHERE email = e")
     cursor.execute(emailexists)
+    if emailexists == 1: 
+        print("Your email already has an account.")
+        n = input(" \n Please enter your Name: \n ")
+        e = input(" \n Please enter the email: \n ")
+        p = input("\n Please enter the password: \n ")
+    
+
+    # we'll need a function to ask how much money they want to put in their account, maybe implement payments -> currently giving a hardcoded value
+    account_number = addAccount(cnx, 0)
+    
+
+    query_add_customer = ("INSERT INTO customer "
+                         "(customerName, accountNo, email, pass) "
+                         "VALUES (%s, %s, %s, %s)")
+
+    # add email validation -> https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/
+    data_customer = (n, account_number, e, p)
+    cursor.execute(query_add_customer, data_customer)
+    cnx.commit()
+
+    cursor.close()
+
+#Changed by Megan Jen, because addCustomer does not work, create addCustomerNew
+def addCustomerNew(cnx):
+    # written by Megan Jen
+    cursor = cnx.cursor()
+    # first create an account
+    n = input(" \n Please enter your Name: \n ")
+    e = input(" \n Please enter the email: \n ")
+    p = input("\n Please enter the password: \n ")
+
+    # first check if the email already exists
+    emailquery = ("SELECT count(*) FROM customer WHERE email = %s")
+    executeemail = (e)
+    cursor.execute(emailquery, (executeemail,))
+    emailexists=cursor.fetchone()[0]
     if emailexists == 1: 
         print("Your email already has an account.")
         n = input(" \n Please enter your Name: \n ")
@@ -169,6 +206,15 @@ def addCustomer(cnx, name, email, passWord):
     cnx.commit()
 
     cursor.close()
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
